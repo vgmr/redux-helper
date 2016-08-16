@@ -1,0 +1,11 @@
+{
+  "resolution": "main",
+  "tree": {
+    "src": "https://raw.githubusercontent.com/andrew-w-ross/typings-expect/8074c7a7a26709d5bb3cfc3d6536f9e5b1418fc0/typings.json",
+    "raw": "registry:global/expect#1.13.4+20160211003958",
+    "main": "expect.d.ts",
+    "global": false,
+    "name": "expect",
+    "type": "typings"
+  }
+}

@@ -1,0 +1,4 @@
+--require ts-node/register
+--reporter min
+--watch-extensions tsx,ts,js 
+test/**/*.test.ts
