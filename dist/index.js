@@ -1,50 +1,64 @@
 "use strict";
-// Option 1, using ReducerHost class
-var ReducerHost = (function () {
-    function ReducerHost(initialState) {
-        var _this = this;
-        this.handlers = {};
-        this.reducer = function () {
-            return function (state, action) {
-                if (state === void 0) { state = _this.initialState; }
-                var reducer = _this.handlers[action.type];
-                if (reducer) {
-                    return reducer(state, action);
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+exports.createAction = function (actionName) {
+    var create = function create(payload) {
+        return { type: actionName, payload: payload };
+    };
+    create.matchAction = function (action) {
+        return action.type === actionName;
+    };
+    return create;
+};
+exports.createCheckedAction = function (actionName, promise, resultAction, opts) {
+    return function (parms) {
+        return {
+            type: actionName,
+            payload: _extends({}, opts, {
+                promise: promise(parms),
+                resultAction: resultAction
+            })
+        };
+    };
+};
+exports.checkedPromiseMiddleware = function (opts) {
+    return function (_ref) {
+        var dispatch = _ref.dispatch;
+        var getState = _ref.getState;
+        return function (next) {
+            return function (action) {
+                if (!action || !action.payload) return next(action);
+                var _action$payload = action.payload;
+                var _action$payload$check = _action$payload.checkStatus;
+                var checkStatus = _action$payload$check === undefined ? false : _action$payload$check;
+                var loadingMessage = _action$payload.loadingMessage;
+                var promise = _action$payload.promise;
+                var resultAction = _action$payload.resultAction;
+
+                if (!promise || typeof promise.then !== 'function' || !resultAction) {
+                    return next(action);
                 }
-                else {
-                    return state;
+                /*
+                    if (checkStatus && getStatus(getState()) != null) {
+                        console.log('check status prevent dispatch!');
+                        return;
+                    };
+                */
+                if (loadingMessage && opts.setStatusMessageAction) {
+                    dispatch(opts.setStatusMessageAction(loadingMessage));
                 }
+                promise.then(function (res) {
+                    return resultAction && dispatch(resultAction(res));
+                }).then(function () {
+                    return loadingMessage && opts.setStatusMessageAction && dispatch(opts.setStatusMessageAction());
+                }).catch(function (err) {
+                    return opts.trhowErrorAction && dispatch(opts.trhowErrorAction(err));
+                });
             };
         };
-        this.initialState = initialState;
-    }
-    ReducerHost.prototype.register = function (actionType, reducer) {
-        this.handlers[actionType] = reducer;
     };
-    return ReducerHost;
-}());
-exports.ReducerHost = ReducerHost;
-// Option 2, using a reducer function.
-function reducer(initialState, handlers) {
-    return function () {
-        return function (state, action) {
-            if (state === void 0) { state = initialState; }
-            var reducer = handlers[action.type];
-            if (reducer) {
-                return reducer(state, action);
-            }
-            else {
-                return state;
-            }
-        };
-    };
-}
-exports.reducer = reducer;
-function actionCreator(type, payload) {
-    return {
-        type: type,
-        payload: payload
-    };
-}
-exports.actionCreator = actionCreator;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = exports.checkedPromiseMiddleware;
 //# sourceMappingURL=index.js.map

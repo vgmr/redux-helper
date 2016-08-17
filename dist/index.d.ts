@@ -1,21 +1,32 @@
-/**
- * This Module will be exported to a package.
- */
 import * as Redux from 'redux';
-export declare class ReducerHost<T> {
-    private handlers;
-    private initialState;
-    constructor(initialState: T);
-    register(actionType: string, reducer: (state: T, action: Redux.Action) => T): void;
-    reducer: () => (state: T, action: Action<any>) => T;
+export interface Action<TPayload> extends Redux.Action {
+    payload: TPayload;
 }
-export declare function reducer<T>(initialState: T, handlers: {
-    [type: string]: (state: T, action: Action<any>) => T;
-}): () => (state: T, action: Action<any>) => T;
-export interface Action<T> extends Redux.Action {
-    payload: T;
+/**
+ * Plain Action creator
+ */
+export interface CreateAction<TPayload> {
+    (payload?: TPayload): ({
+        type: string;
+        payload: TPayload;
+    });
+    matchAction?(action: Redux.Action): action is Action<TPayload>;
 }
-export declare function actionCreator<T>(type: string, payload: T): {
-    type: string;
-    payload: T;
-};
+export declare const createAction: <TPayload>(actionName: string) => CreateAction<TPayload>;
+/**
+ * Checked Action Interface and Creator
+ */
+export interface CheckedActionOptions {
+    checkStatus?: boolean;
+    loadingMessage?: string;
+}
+export declare const createCheckedAction: <TParms, TResult>(actionName: string, promise: (parms: TParms) => Promise<TResult>, resultAction: (res: TResult) => void, opts?: CheckedActionOptions) => (parms?: TParms) => void;
+export interface checkedPromiseMiddlewareOptions {
+    setStatusMessageAction?: (loadingMessage?: string) => Redux.Action;
+    trhowErrorAction?: (errorMessage: string) => Redux.Action;
+}
+export declare const checkedPromiseMiddleware: (opts: checkedPromiseMiddlewareOptions) => ({dispatch, getState}: {
+    dispatch: any;
+    getState: any;
+}) => (next: Redux.Dispatch<any>) => (action: any) => any;
+export default checkedPromiseMiddleware;

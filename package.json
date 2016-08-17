@@ -6,11 +6,12 @@
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "devDependencies": {
-    "react-ts-scripts": "0.1.17",
-    "mocha": "^2.5.3",
+    "babel-plugin-transform-object-assign": "^6.8.0",
     "expect": "^1.20.2",
-    "ts-node": "^1.2.1",
-    "jsdom": "^9.4.1"
+    "jsdom": "^9.4.1",
+    "mocha": "^2.5.3",
+    "react-ts-scripts": "0.1.17",
+    "ts-node": "^1.2.1"
   },
   "dependencies": {
     "redux": "^3.5.2"
@@ -18,7 +19,8 @@
   "scripts": {
     "prepublish": "npm version patch",
     "start": "react-ts-scripts start",
-    "build": "tsc src/index.ts --outDir dist --sourceMap --declaration --target es5",
+    "build": "tsc",
+    "postbuild": "babel dist -d dist",
     "eject": "react-ts-scripts eject",
     "test": "mocha test/config/testSetup.js --opts test/config/mocha.opts"
   }
