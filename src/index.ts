@@ -41,3 +41,38 @@ export const createCheckedAction = <TParms, TResult>(
             }
         );
 
+export interface checkedPromiseMiddlewareOptions {
+    setStatusMessageAction?: (loadingMessage?:string) => Redux.Action;
+    trhowErrorAction?: (errorMessage:string) => Redux.Action;
+}
+
+export const checkedPromiseMiddleware = (opts:checkedPromiseMiddlewareOptions) => ({dispatch, getState}) => (next: Redux.Dispatch<any>) => (action: any) => {
+    if (!action || !action.payload) return next(action);
+    const {
+        checkStatus = false,
+        loadingMessage,
+        promise,
+        resultAction
+    } = action.payload;
+
+    if (!promise || (typeof promise.then !== 'function' || !resultAction)) {
+        return next(action);
+    }
+/*
+    if (checkStatus && getStatus(getState()) != null) {
+        console.log('check status prevent dispatch!');
+        return;
+    };
+*/
+
+    if (loadingMessage && opts.setStatusMessageAction) {
+        dispatch(opts.setStatusMessageAction(loadingMessage));
+    }
+
+    promise
+        .then(res => resultAction && dispatch(resultAction(res)))
+        .then(() => loadingMessage && opts.setStatusMessageAction && dispatch(opts.setStatusMessageAction()))
+        .catch(err => opts.trhowErrorAction && dispatch(opts.trhowErrorAction(err)));
+}
+
+export default checkedPromiseMiddleware;
