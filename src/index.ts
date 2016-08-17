@@ -1,55 +1,43 @@
-/**
- * This Module will be exported to a package.
- */
 import * as Redux from 'redux';
 
-// Option 1, using ReducerHost class
-export class ReducerHost<T> {
-    private handlers: { [type: string]: (state: T, action: Action<any>) => T } = {};
-    private initialState:T;
+export interface Action<TPayload> extends Redux.Action {
+    payload: TPayload
+}
 
-    public constructor (initialState:T) {
-        this.initialState = initialState;
-    }
+/**
+ * Plain Action creator
+ */
+export interface CreateAction<TPayload> {
+    (payload?: TPayload): ({ type: string, payload: TPayload });
+    matchAction?(action: Redux.Action): action is Action<TPayload>;
+}
 
-    public register(actionType: string, reducer: (state: T, action: Redux.Action) => T) {
-        this.handlers[actionType] = reducer;
-    }
+export const createAction = <TPayload>(actionName: string): CreateAction<TPayload> => {
+    let create: CreateAction<TPayload> = <TPayload>(payload?: TPayload) => ({ type: actionName, payload: payload });
+    create.matchAction = <TPayLoad>(action: Redux.Action): action is Action<TPayload> => action.type === actionName;
+    return create;
+}
 
-    public reducer = () => {
-        return (state = this.initialState , action: Action<any>) => {
-            const reducer = this.handlers[action.type];
-            if (reducer) {
-                return reducer(state, action);
-            } else {
-                return state;
+/**
+ * Checked Action Interface and Creator
+ */
+export interface CheckedActionOptions {
+    checkStatus?: boolean,
+    loadingMessage?: string,
+}
+
+export const createCheckedAction = <TParms, TResult>(
+    actionName: string,
+    promise: (parms: TParms) => Promise<TResult>,
+    resultAction: (res: TResult) => void,
+    opts?: CheckedActionOptions): (parms?: TParms) => void => (parms?: TParms) =>
+        (
+            {
+                type: actionName,
+                payload: Object.assign({}, opts, {
+                    promise: promise(parms),
+                    resultAction: resultAction
+                })
             }
-        }
-    }
-}
-
-// Option 2, using a reducer function.
-export function reducer<T>(initialState:T,handlers: { [type: string]: (state: T, action: Action<any>) => T }) {
-    return () => {
-        return (state = initialState, action: Action<any>) => {
-            const reducer = handlers[action.type];
-            if (reducer) {
-                return reducer(state, action);
-            } else {
-                return state;
-            }
-        }
-    }
-}
-
-export interface Action<T> extends Redux.Action {
-    payload: T
-}
-
-export function actionCreator<T>(type: string, payload: T) {
-    return {
-        type,
-        payload
-    }
-}
+        );
 
