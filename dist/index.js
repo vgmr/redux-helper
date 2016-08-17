@@ -23,9 +23,7 @@ exports.createCheckedAction = function (actionName, promise, resultAction, opts)
     };
 };
 exports.checkedPromiseMiddleware = function (opts) {
-    return function (_ref) {
-        var dispatch = _ref.dispatch;
-        var getState = _ref.getState;
+    return function (middleware) {
         return function (next) {
             return function (action) {
                 if (!action || !action.payload) return next(action);
@@ -46,14 +44,14 @@ exports.checkedPromiseMiddleware = function (opts) {
                     };
                 */
                 if (loadingMessage && opts.setStatusMessageAction) {
-                    dispatch(opts.setStatusMessageAction(loadingMessage));
+                    middleware.dispatch(opts.setStatusMessageAction(loadingMessage));
                 }
                 promise.then(function (res) {
-                    return resultAction && dispatch(resultAction(res));
+                    return resultAction && middleware.dispatch(resultAction(res));
                 }).then(function () {
-                    return loadingMessage && opts.setStatusMessageAction && dispatch(opts.setStatusMessageAction());
+                    return loadingMessage && opts.setStatusMessageAction && middleware.dispatch(opts.setStatusMessageAction());
                 }).catch(function (err) {
-                    return opts.trhowErrorAction && dispatch(opts.trhowErrorAction(err));
+                    return opts.trhowErrorAction && middleware.dispatch(opts.trhowErrorAction(err));
                 });
             };
         };

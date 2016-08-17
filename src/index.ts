@@ -46,7 +46,8 @@ export interface checkedPromiseMiddlewareOptions {
     trhowErrorAction?: (errorMessage:string) => Redux.Action;
 }
 
-export const checkedPromiseMiddleware = (opts:checkedPromiseMiddlewareOptions) => ({dispatch, getState}) => (next: Redux.Dispatch<any>) => (action: any) => {
+
+export const checkedPromiseMiddleware = (opts:checkedPromiseMiddlewareOptions) => (middleware:Redux.MiddlewareAPI<any>) => (next: Redux.Dispatch<any>) => (action: any) => {
     if (!action || !action.payload) return next(action);
     const {
         checkStatus = false,
@@ -66,13 +67,13 @@ export const checkedPromiseMiddleware = (opts:checkedPromiseMiddlewareOptions) =
 */
 
     if (loadingMessage && opts.setStatusMessageAction) {
-        dispatch(opts.setStatusMessageAction(loadingMessage));
+        middleware.dispatch(opts.setStatusMessageAction(loadingMessage));
     }
 
     promise
-        .then(res => resultAction && dispatch(resultAction(res)))
-        .then(() => loadingMessage && opts.setStatusMessageAction && dispatch(opts.setStatusMessageAction()))
-        .catch(err => opts.trhowErrorAction && dispatch(opts.trhowErrorAction(err)));
+        .then(res => resultAction && middleware.dispatch(resultAction(res)))
+        .then(() => loadingMessage && opts.setStatusMessageAction && middleware.dispatch(opts.setStatusMessageAction()))
+        .catch(err => opts.trhowErrorAction && middleware.dispatch(opts.trhowErrorAction(err)));
 }
 
 export default checkedPromiseMiddleware;

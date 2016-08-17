@@ -25,8 +25,5 @@ export interface checkedPromiseMiddlewareOptions {
     setStatusMessageAction?: (loadingMessage?: string) => Redux.Action;
     trhowErrorAction?: (errorMessage: string) => Redux.Action;
 }
-export declare const checkedPromiseMiddleware: (opts: checkedPromiseMiddlewareOptions) => ({dispatch, getState}: {
-    dispatch: any;
-    getState: any;
-}) => (next: Redux.Dispatch<any>) => (action: any) => any;
+export declare const checkedPromiseMiddleware: (opts: checkedPromiseMiddlewareOptions) => (middleware: Redux.MiddlewareAPI<any>) => (next: Redux.Dispatch<any>) => (action: any) => any;
 export default checkedPromiseMiddleware;
