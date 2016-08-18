@@ -4,13 +4,22 @@ action creator, checked action creator and checked promise middleware.
 
 # Usage 
 
-## install
-
-include the package in your typescript project.
-
 ```bash
 npm i 'redux-helper' --save
 ```
+
+Simple action creator
+```ts
+//actions.ts
+import {createAction} from 'redux-helper';
+
+export const addProduct =  createAction<{name:string}> ('ADD_TODO');
+
+//reducer.ts
+
+
+```
+
 
 ## Use action creator
 
