@@ -1,6 +1,6 @@
 {
   "name": "redux-helper",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "Redux reducer and action helper",
   "private": false,
   "main": "dist/index.js",
