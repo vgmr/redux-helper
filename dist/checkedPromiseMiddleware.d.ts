@@ -5,8 +5,5 @@ export interface CheckedPromiseMiddlewareOptions {
     onEnd?: () => Redux.Action;
     shouldExecute?: (getState: any) => boolean;
 }
-declare const checkedPromiseMiddleware: (options?: CheckedPromiseMiddlewareOptions) => ({dispatch, getState}: {
-    dispatch: any;
-    getState: any;
-}) => (next: Redux.Dispatch<any>) => (action: any) => any;
+declare const checkedPromiseMiddleware: (options?: CheckedPromiseMiddlewareOptions) => (middleware: any) => (next: Redux.Dispatch<any>) => (action: any) => any;
 export default checkedPromiseMiddleware;

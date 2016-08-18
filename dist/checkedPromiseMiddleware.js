@@ -4,11 +4,12 @@ var _validFunction = function _validFunction(obj) {
     return obj && typeof obj === 'function';
 };
 var checkedPromiseMiddleware = function checkedPromiseMiddleware(options) {
-    return function (_ref) {
-        var dispatch = _ref.dispatch;
-        var getState = _ref.getState;
+    return function (middleware) {
         return function (next) {
             return function (action) {
+                var dispatch = middleware.dispatch;
+                var getState = middleware.getState;
+
                 var opts = options || {};
                 if (!action || !action.payload) return next(action);
                 var _action$payload = action.payload;
