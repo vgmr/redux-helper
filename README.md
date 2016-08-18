@@ -1,6 +1,15 @@
 # redux-helper
 
-action creator, checked action creator and checked promise middleware.
+_Action creator, checked action creator and checked promise middleware._
+
+This library is written in order to support development of projects using redux in typescript.
+
+The goal is to try to get as much advantage as possible form the strong typing system that typescript provide in
+order to reduce errors and catch them early.
+
+> For example actions will be defined once and they will provide a matchAction function that reducers can use
+to match the received action and get the typed payload.
+
 
 # Usage 
 
