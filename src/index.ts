@@ -30,7 +30,7 @@ export const createCheckedAction = <TParms, TResult>(
     actionName: string,
     promise: (parms: TParms) => Promise<TResult>,
     resultAction: (res: TResult) => void,
-    opts?: CheckedActionOptions): (parms?: TParms) => void => (parms?: TParms) =>
+    opts?: CheckedActionOptions) => (parms?: TParms) =>
         (
             {
                 type: actionName,
