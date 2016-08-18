@@ -11,8 +11,9 @@ const _validFunction = (obj: any): boolean => {
     return obj && typeof obj === 'function';
 }
 
-const checkedPromiseMiddleware = (options?: CheckedPromiseMiddlewareOptions) => ({dispatch, getState}) => (next: Redux.Dispatch<any>) => (action: any) => {
-
+const checkedPromiseMiddleware = (options?: CheckedPromiseMiddlewareOptions) => (middleware:any) => (next: Redux.Dispatch<any>) => (action: any) => {
+    const {dispatch,getState} = middleware;
+    
     let opts = options || {};
 
     if (!action || !action.payload) return next(action);
