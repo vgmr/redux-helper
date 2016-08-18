@@ -16,7 +16,15 @@ import {createAction} from 'redux-helper';
 export const addProduct =  createAction<{name:string}> ('ADD_TODO');
 
 //reducer.ts
+import {Action} from 'redux-helper';
+import {addProduct} from './actions.ts';
 
+const reducer = (state: IProductsModel = defaultState, action: Action<any>) => {
+    if (actions.addProduct.matchAction(action)) {
+        ...
+        // the type of action payload here is {name:string}
+        // 
+    }
 
 ```
 
