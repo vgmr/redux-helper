@@ -18,7 +18,7 @@
     "redux": "^3.5.2"
   },
   "scripts": {
-    "publish": "npm run build & npm version patch & npm publish",
+    "prepublish": "npm test & npm run build & npm version patch",
     "build": "tsc",
     "postbuild": "babel dist -d dist",
     "test": "mocha test/config/testSetup.js --opts test/config/mocha.opts"
