@@ -20,7 +20,13 @@ export interface CheckedActionOptions {
     checkStatus?: boolean;
     loadingMessage?: string;
 }
-export declare const createCheckedAction: <TParms, TResult>(actionName: string, promise: (parms: TParms) => Promise<TResult>, resultAction: (res: TResult) => void, opts?: CheckedActionOptions) => (parms?: TParms) => void;
+export declare const createCheckedAction: <TParms, TResult>(actionName: string, promise: (parms: TParms) => Promise<TResult>, resultAction: (res: TResult) => void, opts?: CheckedActionOptions) => (parms?: TParms) => {
+    type: string;
+    payload: {} & CheckedActionOptions & {
+        promise: Promise<TResult>;
+        resultAction: (res: TResult) => void;
+    };
+};
 export interface checkedPromiseMiddlewareOptions {
     setStatusMessageAction?: (loadingMessage?: string) => Redux.Action;
     trhowErrorAction?: (errorMessage: string) => Redux.Action;
