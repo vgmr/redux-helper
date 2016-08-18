@@ -17,11 +17,9 @@
     "redux": "^3.5.2"
   },
   "scripts": {
-    "prepublish": "npm version patch",
-    "start": "react-ts-scripts start",
+    "publish": "npm run build & npm version patch & npm publish",
     "build": "tsc",
     "postbuild": "babel dist -d dist",
-    "eject": "react-ts-scripts eject",
     "test": "mocha test/config/testSetup.js --opts test/config/mocha.opts"
   }
 }
