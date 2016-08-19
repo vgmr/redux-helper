@@ -1,9 +1,12 @@
-import * as Redux from 'redux';
+import { Action, Dispatch } from 'redux';
 export interface CheckedPromiseMiddlewareOptions {
-    onError?: (error?: any, dispatch?: Redux.Dispatch<any>) => (void | Redux.Action);
-    onStart?: (message?: string) => Redux.Action;
-    onEnd?: () => Redux.Action;
+    onError?: (error?: any, dispatch?: Dispatch<any>) => (void | Action);
+    onStart?: (message?: string) => Action;
+    onEnd?: () => Action;
     shouldExecute?: (getState: any) => boolean;
 }
-declare const checkedPromiseMiddleware: (options?: CheckedPromiseMiddlewareOptions) => (middleware: any) => (next: Redux.Dispatch<any>) => (action: any) => any;
+declare const checkedPromiseMiddleware: (options?: CheckedPromiseMiddlewareOptions) => ({ dispatch, getState }: {
+    dispatch: Dispatch<any>;
+    getState: () => any;
+}) => (next: Dispatch<any>) => (action: any) => any;
 export default checkedPromiseMiddleware;

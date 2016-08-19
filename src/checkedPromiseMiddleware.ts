@@ -1,9 +1,9 @@
-import * as Redux from 'redux';
+import {Action, Dispatch} from 'redux';
 
 export interface CheckedPromiseMiddlewareOptions {
-    onError?: (error?: any, dispatch?: Redux.Dispatch<any>) => (void | Redux.Action);
-    onStart?: (message?: string) => Redux.Action;
-    onEnd?: () => Redux.Action;
+    onError?: (error?: any, dispatch?: Dispatch<any>) => (void | Action);
+    onStart?: (message?: string) => Action;
+    onEnd?: () => Action;
     shouldExecute?: (getState: any) => boolean;
 }
 
@@ -11,46 +11,50 @@ const _validFunction = (obj: any): boolean => {
     return obj && typeof obj === 'function';
 }
 
-const checkedPromiseMiddleware = (options?: CheckedPromiseMiddlewareOptions) => (middleware:any) => (next: Redux.Dispatch<any>) => (action: any) => {
-    const {dispatch,getState} = middleware;
-    
-    let opts = options || {};
+const _validAction = (object: any): object is Action => {
+    return object && object instanceof Object &&
+        !(object instanceof Array) &&
+        typeof object !== "function" &&
+        typeof object.type === "string";
+}
 
+const checkedPromiseMiddleware = (options?: CheckedPromiseMiddlewareOptions) => ({ dispatch, getState }: { dispatch: Dispatch<any>, getState: () => any }) => (next: Dispatch<any>) => (action: any) => {
     if (!action || !action.payload) return next(action);
+    let opts = options || {};
     const {
         checkExecution = false,
         enableProgress = true,
         message = 'loading',
-        promise,
+        promise = undefined as Promise<any>,
         resultAction
     } = action.payload;
 
-    if (!promise || (typeof promise.then !== 'function' || !resultAction)) {
+    if (!promise || typeof promise.then !== 'function' || !resultAction) {
         return next(action);
     }
 
     if (checkExecution && _validFunction(opts.shouldExecute) && !opts.shouldExecute(getState)) {
-        console.log('check status prevent dispatch!');
         return;
     }
 
     if (enableProgress && _validFunction(opts.onStart)) {
         let actStart = opts.onStart(message);
-        if (actStart) dispatch(actStart);
+        if (_validAction(actStart)) dispatch(actStart);
     }
 
-    promise
-        .then(res => resultAction && dispatch(resultAction(res)))
-        .catch((err) => {
+    return promise.then(
+        response => {
+            resultAction && dispatch(resultAction(response))
+        },
+        error => {
             if (_validFunction(opts.onError)) {
-                let actToDispatch = opts.onError(err, dispatch);
-                if (actToDispatch) dispatch(actToDispatch);
+                let actToDispatch = opts.onError(error, dispatch);
+                if (_validAction(actToDispatch)) dispatch(actToDispatch);
             }
-        })
-        .then(() => {
+        }).then(() => {
             if (enableProgress && _validFunction(opts.onEnd)) {
                 let actEnd = opts.onEnd();
-                if (actEnd) dispatch(actEnd);
+                if (_validAction(actEnd)) dispatch(actEnd);
             }
         });
 }
