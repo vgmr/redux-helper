@@ -13,7 +13,7 @@
     "jsdom": "^9.4.1",
     "mocha": "^2.5.3",
     "react-ts-scripts": "0.1.17",
-    "ts-node": "^1.2.1"
+    "ts-node": "^1.2.3"
   },
   "dependencies": {
     "redux": "^3.5.2"
