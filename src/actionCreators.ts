@@ -21,6 +21,10 @@ export const createAction = <TPayload>(actionName: string): CreateAction<TPayloa
 /**
  * Checked Action Interface and Creator
  */
+export interface CreateCheckedAction<TParms> {
+    (parms?: TParms) : void;
+}
+
 export interface CheckedActionOptions {
     checkStatus?: boolean,
     loadingMessage?: string,
@@ -30,7 +34,7 @@ export const createCheckedAction = <TParms, TResult>(
     actionName: string,
     promise: (parms: TParms) => Promise<TResult>,
     resultAction: (res: TResult) => void,
-    opts?: CheckedActionOptions) => (parms?: TParms) =>
+    opts?: CheckedActionOptions): CreateCheckedAction<TParms> => (parms?: TParms) =>
         (
             {
                 type: actionName,

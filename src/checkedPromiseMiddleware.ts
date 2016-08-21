@@ -1,10 +1,10 @@
-import {Action, Dispatch,MiddlewareAPI} from 'redux';
+import {Action, Dispatch} from 'redux';
 
 export interface CheckedPromiseMiddlewareOptions {
-    onError?: (error?: any, dispatch?: Dispatch<any>) => (void | Action);
     onStart?: (message?: string) => Action;
     onEnd?: () => Action;
-    shouldExecute?: (getState: any) => boolean;
+    onError?: (error?: any) => Action;
+    shouldExecute?: (state: any) => boolean;
 }
 
 const _validFunction = (obj: any): boolean => {
@@ -18,10 +18,7 @@ const _validAction = (object: any): object is Action => {
         typeof object.type === "string";
 }
 
-const checkedPromiseMiddleware = (options?: CheckedPromiseMiddlewareOptions) => (middleware: MiddlewareAPI<any>) => (next: Dispatch<any>) => (action: any) => {
-    const {dispatch,getState} = middleware;
-
-
+const checkedPromiseMiddleware = (options?: CheckedPromiseMiddlewareOptions) => ({ dispatch, getState }: { dispatch: Dispatch<any>, getState: () => any }) => (next: Dispatch<any>) => (action: any) => {
     if (!action || !action.payload) return next(action);
     let opts = options || {};
     const {
@@ -36,12 +33,12 @@ const checkedPromiseMiddleware = (options?: CheckedPromiseMiddlewareOptions) => 
         return next(action);
     }
 
-    if (checkExecution && _validFunction(opts.shouldExecute) && !opts.shouldExecute(getState)) {
+    if (checkExecution && _validFunction(opts.shouldExecute) && !opts.shouldExecute(getState())) {
         return;
     }
 
     if (enableProgress && _validFunction(opts.onStart)) {
-        let actStart = opts.onStart(message);
+        const actStart = opts.onStart(message);
         if (_validAction(actStart)) dispatch(actStart);
     }
 
@@ -51,12 +48,12 @@ const checkedPromiseMiddleware = (options?: CheckedPromiseMiddlewareOptions) => 
         },
         error => {
             if (_validFunction(opts.onError)) {
-                let actToDispatch = opts.onError(error, dispatch);
+                const actToDispatch = opts.onError(error);
                 if (_validAction(actToDispatch)) dispatch(actToDispatch);
             }
         }).then(() => {
             if (enableProgress && _validFunction(opts.onEnd)) {
-                let actEnd = opts.onEnd();
+                const actEnd = opts.onEnd();
                 if (_validAction(actEnd)) dispatch(actEnd);
             }
         });
