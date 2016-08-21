@@ -19,26 +19,30 @@ export const createAction = <TPayload>(actionName: string): CreateAction<TPayloa
 }
 
 /**
- * Checked Action Interface and Creator
+ * Promise Action Interface and Creator
  */
-export interface CreateCheckedAction<TParms> {
-    (parms?: TParms) : Redux.Action;
+export interface CreatePromiseAction<TParms> {
+    (parms?: TParms): Redux.Action;
 }
 
-export interface CheckedActionOptions {
-    checkStatus?: boolean,
-    loadingMessage?: string,
+/**
+ * Promise Action Options
+ */
+export interface CreatePromiseActionOptions {
+    checkExecution?: boolean,
+    enableProgress?: boolean,
+    message?: string
 }
 
 export const createCheckedAction = <TParms, TResult>(
     actionName: string,
     promise: (parms: TParms) => Promise<TResult>,
-    resultAction: (res: TResult) => void,
-    opts?: CheckedActionOptions): CreateCheckedAction<TParms> => (parms?: TParms) =>
+    resultAction: (res: TResult) => Redux.Action,
+    options?: CreatePromiseActionOptions): CreatePromiseAction<TParms> => (parms?: TParms) =>
         (
             {
                 type: actionName,
-                payload: Object.assign({}, opts, {
+                payload: Object.assign({}, options, {
                     promise: promise(parms),
                     resultAction: resultAction
                 })
