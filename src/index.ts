@@ -17,5 +17,3 @@ export {
     CreateAction,
     CheckedActionOptions
 }
-
-

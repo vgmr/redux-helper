@@ -1,4 +1,4 @@
-import {Action, Dispatch} from 'redux';
+import {Action, Dispatch, MiddlewareAPI} from 'redux';
 
 export interface CheckedPromiseMiddlewareOptions {
     onStart?: (message?: string) => Action;
@@ -18,7 +18,7 @@ const _validAction = (object: any): object is Action => {
         typeof object.type === "string";
 }
 
-const checkedPromiseMiddleware = (options?: CheckedPromiseMiddlewareOptions) => ({ dispatch, getState }: { dispatch: Dispatch<any>, getState: () => any }) => (next: Dispatch<any>) => (action: any) => {
+const checkedPromiseMiddleware = (options?: CheckedPromiseMiddlewareOptions) => (midlapi : MiddlewareAPI<any>) => (next: Dispatch<any>) => (action: any) => {
     if (!action || !action.payload) return next(action);
     let opts = options || {};
     const {
@@ -33,6 +33,8 @@ const checkedPromiseMiddleware = (options?: CheckedPromiseMiddlewareOptions) => 
         return next(action);
     }
 
+    const {dispatch, getState} = midlapi;
+    
     if (checkExecution && _validFunction(opts.shouldExecute) && !opts.shouldExecute(getState())) {
         return;
     }

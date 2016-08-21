@@ -7,9 +7,7 @@ var _validAction = function _validAction(object) {
     return object && object instanceof Object && !(object instanceof Array) && typeof object !== "function" && typeof object.type === "string";
 };
 var checkedPromiseMiddleware = function checkedPromiseMiddleware(options) {
-    return function (_ref) {
-        var dispatch = _ref.dispatch;
-        var getState = _ref.getState;
+    return function (midlapi) {
         return function (next) {
             return function (action) {
                 if (!action || !action.payload) return next(action);
@@ -28,6 +26,9 @@ var checkedPromiseMiddleware = function checkedPromiseMiddleware(options) {
                 if (!promise || typeof promise.then !== 'function' || !resultAction) {
                     return next(action);
                 }
+                var dispatch = midlapi.dispatch;
+                var getState = midlapi.getState;
+
                 if (checkExecution && _validFunction(opts.shouldExecute) && !opts.shouldExecute(getState())) {
                     return;
                 }
