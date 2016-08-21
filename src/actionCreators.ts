@@ -34,7 +34,7 @@ export interface CreatePromiseActionOptions {
     message?: string
 }
 
-export const createCheckedAction = <TParms, TResult>(
+export const createPromiseAction = <TParms, TResult>(
     actionName: string,
     promise: (parms: TParms) => Promise<TResult>,
     resultAction: (res: TResult) => Redux.Action,
