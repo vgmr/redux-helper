@@ -1,4 +1,4 @@
-# redux-helper
+# redux-helper ![npm version](https://img.shields.io/npm/v/redux-helper.svg?style=flat)
 
 _Action creator, checked action creator and checked promise middleware._
 
