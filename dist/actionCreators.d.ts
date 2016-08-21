@@ -16,14 +16,11 @@ export declare const createAction: <TPayload>(actionName: string) => CreateActio
 /**
  * Checked Action Interface and Creator
  */
+export interface CreateCheckedAction<TParms> {
+    (parms?: TParms): void;
+}
 export interface CheckedActionOptions {
     checkStatus?: boolean;
     loadingMessage?: string;
 }
-export declare const createCheckedAction: <TParms, TResult>(actionName: string, promise: (parms: TParms) => Promise<TResult>, resultAction: (res: TResult) => void, opts?: CheckedActionOptions) => (parms?: TParms) => {
-    type: string;
-    payload: {} & CheckedActionOptions & {
-        promise: Promise<TResult>;
-        resultAction: (res: TResult) => void;
-    };
-};
+export declare const createCheckedAction: <TParms, TResult>(actionName: string, promise: (parms: TParms) => Promise<TResult>, resultAction: (res: TResult) => void, opts?: CheckedActionOptions) => CreateCheckedAction<TParms>;

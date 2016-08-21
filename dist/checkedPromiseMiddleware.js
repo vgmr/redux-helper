@@ -7,12 +7,11 @@ var _validAction = function _validAction(object) {
     return object && object instanceof Object && !(object instanceof Array) && typeof object !== "function" && typeof object.type === "string";
 };
 var checkedPromiseMiddleware = function checkedPromiseMiddleware(options) {
-    return function (middleware) {
+    return function (_ref) {
+        var dispatch = _ref.dispatch;
+        var getState = _ref.getState;
         return function (next) {
             return function (action) {
-                var dispatch = middleware.dispatch;
-                var getState = middleware.getState;
-
                 if (!action || !action.payload) return next(action);
                 var opts = options || {};
                 var _action$payload = action.payload;
@@ -29,7 +28,7 @@ var checkedPromiseMiddleware = function checkedPromiseMiddleware(options) {
                 if (!promise || typeof promise.then !== 'function' || !resultAction) {
                     return next(action);
                 }
-                if (checkExecution && _validFunction(opts.shouldExecute) && !opts.shouldExecute(getState)) {
+                if (checkExecution && _validFunction(opts.shouldExecute) && !opts.shouldExecute(getState())) {
                     return;
                 }
                 if (enableProgress && _validFunction(opts.onStart)) {
@@ -40,7 +39,7 @@ var checkedPromiseMiddleware = function checkedPromiseMiddleware(options) {
                     resultAction && dispatch(resultAction(response));
                 }, function (error) {
                     if (_validFunction(opts.onError)) {
-                        var actToDispatch = opts.onError(error, dispatch);
+                        var actToDispatch = opts.onError(error);
                         if (_validAction(actToDispatch)) dispatch(actToDispatch);
                     }
                 }).then(function () {
