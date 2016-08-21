@@ -22,7 +22,7 @@ export const createAction = <TPayload>(actionName: string): CreateAction<TPayloa
  * Checked Action Interface and Creator
  */
 export interface CreateCheckedAction<TParms> {
-    (parms?: TParms) : void;
+    (parms?: TParms) : Redux.Action;
 }
 
 export interface CheckedActionOptions {
