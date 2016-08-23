@@ -29,7 +29,7 @@ const checkedPromiseMiddleware = (options?: CheckedPromiseMiddlewareOptions) => 
         resultAction
     } = action.payload;
 
-    if (!promise || typeof promise.then !== 'function' || !resultAction) {
+    if (!promise || typeof promise.then !== 'function' || ! _validAction(resultAction)) {
         return next(action);
     }
 
@@ -46,7 +46,7 @@ const checkedPromiseMiddleware = (options?: CheckedPromiseMiddlewareOptions) => 
 
     return promise.then(
         response => {
-            resultAction && dispatch(resultAction(response))
+            dispatch(resultAction(response));
         },
         error => {
             if (_validFunction(opts.onError)) {

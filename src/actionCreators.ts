@@ -8,7 +8,7 @@ export interface Action<TPayload> extends Redux.Action {
  * Plain Action creator
  */
 export interface CreateAction<TPayload> {
-    (payload?: TPayload): ({ type: string, payload: TPayload });
+    (payload?: TPayload): Action<TPayload>;
     matchAction?(action: Redux.Action): action is Action<TPayload>;
 }
 
