@@ -1,6 +1,6 @@
-# redux-helper [![npm version](https://img.shields.io/npm/v/redux-helper.svg?style=flat)](https://www.npmjs.com/package/redux-helper)
+# redux-helper [![npm version](https://img.shields.io/npm/v/redux-helper.svg?style=flat)](https://www.npmjs.com/package/redux-helper) [![build](https://travis-ci.org/vgmr/redux-helper.svg)](https://travis-ci.org/vgmr/redux-helper)
 
-_Action creator, checked action creator and checked promise middleware._
+_Action creator, promise action creator and checked promise middleware._
 
 This library is written in order to support development of projects using redux in typescript.
 
@@ -45,10 +45,10 @@ import {addProduct} from './actions.ts';
 ...
 ```
 
-### Checked action creator
+### Promise action creator
 ```ts
 //actions.ts
-import {createCheckedAction} from 'redux-helper';
+import {createPromiseAction} from 'redux-helper';
 
 ```
 

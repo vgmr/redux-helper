@@ -2,7 +2,7 @@
   "name": "redux-helper",
   "version": "0.0.28",
   "description": "Redux reducer and action helper",
-  "repository": "https://github.com/smulas/redux-helper/",
+  "repository": "https://github.com/vgmr/redux-helper/",
   "private": false,
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
