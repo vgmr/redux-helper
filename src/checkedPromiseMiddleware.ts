@@ -29,7 +29,7 @@ const checkedPromiseMiddleware = (options?: CheckedPromiseMiddlewareOptions) => 
         resultAction
     } = action.payload;
 
-    if (!promise || typeof promise.then !== 'function' || ! _validAction(resultAction)) {
+    if (!promise || typeof promise.then !== 'function' || ! _validFunction(resultAction)) {
         return next(action);
     }
 
@@ -46,12 +46,16 @@ const checkedPromiseMiddleware = (options?: CheckedPromiseMiddlewareOptions) => 
 
     return promise.then(
         response => {
-            dispatch(resultAction(response));
+            const actResult = resultAction(response);
+            if (!_validAction(actResult))
+                throw new Error(`Action "${action.type}" - result is not an action!`);
+            else
+                dispatch(actResult);
         },
         error => {
             if (_validFunction(opts.onError)) {
-                const actToDispatch = opts.onError(error);
-                if (_validAction(actToDispatch)) dispatch(actToDispatch);
+                const actError = opts.onError(error);
+                if (_validAction(actError)) dispatch(actError);
             }
         }).then(() => {
             if (enableProgress && _validFunction(opts.onEnd)) {
