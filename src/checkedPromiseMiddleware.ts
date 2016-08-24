@@ -1,8 +1,8 @@
 import {Action, Dispatch, MiddlewareAPI} from 'redux';
 
 export interface CheckedPromiseMiddlewareOptions {
-    onStart?: (message?: string) => Action;
-    onEnd?: () => Action;
+    onStart?: (message?: string, actionType?: string) => Action;
+    onEnd?: (actionType?: string) => Action;
     onError?: (error?: any) => Action;
     shouldExecute?: (state: any) => boolean;
 }
@@ -18,7 +18,7 @@ const _validAction = (object: any): object is Action => {
         typeof object.type === "string";
 }
 
-const checkedPromiseMiddleware = (options?: CheckedPromiseMiddlewareOptions) => (midlapi : MiddlewareAPI<any>) => (next: Dispatch<any>) => (action: any) => {
+const checkedPromiseMiddleware = (options?: CheckedPromiseMiddlewareOptions) => (midlapi: MiddlewareAPI<any>) => (next: Dispatch<any>) => (action: any) => {
     if (!action || !action.payload) return next(action);
     let opts = options || {};
     const {
@@ -29,23 +29,29 @@ const checkedPromiseMiddleware = (options?: CheckedPromiseMiddlewareOptions) => 
         resultAction
     } = action.payload;
 
-    if (!promise || typeof promise.then !== 'function' || ! _validFunction(resultAction)) {
+    if (!promise || typeof promise.then !== 'function' || !_validFunction(resultAction)) {
         return next(action);
     }
 
     const {dispatch, getState} = midlapi;
-    
+
     if (checkExecution && _validFunction(opts.shouldExecute) && !opts.shouldExecute(getState())) {
+        console.log('discarding action ' + action.type);
         return;
     }
 
     if (enableProgress && _validFunction(opts.onStart)) {
-        const actStart = opts.onStart(message);
+        const actStart = opts.onStart(message, action.type);
         if (_validAction(actStart)) dispatch(actStart);
     }
 
     return promise.then(
         response => {
+            if (enableProgress && _validFunction(opts.onEnd)) {
+                const actEnd = opts.onEnd(action.type);
+                if (_validAction(actEnd)) dispatch(actEnd);
+            }
+
             const actResult = resultAction(response);
             if (!_validAction(actResult))
                 throw new Error(`Action "${action.type}" - result is not an action!`);
@@ -56,11 +62,6 @@ const checkedPromiseMiddleware = (options?: CheckedPromiseMiddlewareOptions) => 
             if (_validFunction(opts.onError)) {
                 const actError = opts.onError(error);
                 if (_validAction(actError)) dispatch(actError);
-            }
-        }).then(() => {
-            if (enableProgress && _validFunction(opts.onEnd)) {
-                const actEnd = opts.onEnd();
-                if (_validAction(actEnd)) dispatch(actEnd);
             }
         });
 }
