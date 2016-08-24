@@ -1,6 +1,9 @@
-# redux-helper [![npm version](https://img.shields.io/npm/v/redux-helper.svg?style=flat)](https://www.npmjs.com/package/redux-helper) [![build](https://travis-ci.org/vgmr/redux-helper.svg)](https://travis-ci.org/vgmr/redux-helper)
-
+# redux-helper 
 _Action creator, promise action creator and checked promise middleware._
+
+[![npm version](https://img.shields.io/npm/v/redux-helper.svg?style=flat)](https://www.npmjs.com/package/redux-helper) [![build](https://travis-ci.org/vgmr/redux-helper.svg)](https://travis-ci.org/vgmr/redux-helper) 
+
+[![dependency](https://david-dm.org/vgmr/redux-helper/status.svg)](https://david-dm.org/vgmr/redux-helper) [![devDep](https://david-dm.org/vgmr/redux-helper/dev-status.svg)](https://david-dm.org/vgmr/redux-helper?type=dev)
 
 This library is written in order to support development of projects using redux in typescript.
 
