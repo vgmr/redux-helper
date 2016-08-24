@@ -1,11 +1,13 @@
 {
   "name": "redux-helper",
-  "version": "0.0.33",
+  "version": "0.0.34",
   "description": "Redux reducer and action helper",
   "repository": "https://github.com/vgmr/redux-helper/",
   "private": false,
   "main": "dist/index.js",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "typings": "dist/index.d.ts",
   "devDependencies": {
     "babel-cli": "^6.11.4",
