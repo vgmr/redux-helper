@@ -1,10 +1,6 @@
 {
   "name": "redux-helper",
-<<<<<<< HEAD
-  "version": "0.0.29",
-=======
   "version": "0.0.35",
->>>>>>> 14c5617f3caf7f82dd718a5b624540ed7bd45a89
   "description": "Redux reducer and action helper",
   "repository": "https://github.com/vgmr/redux-helper/",
   "private": false,
