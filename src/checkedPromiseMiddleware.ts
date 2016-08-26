@@ -1,5 +1,5 @@
 import {Action, Dispatch, MiddlewareAPI} from 'redux';
-import {PromiseAction, IPromiseActionPayload} from './actionCreators'
+import {PromiseAction, IPromiseAction} from './actionCreators'
 
 export interface CheckedPromiseMiddlewareOptions {
     onStart?: (message?: string) => Action;
@@ -45,7 +45,7 @@ const checkedPromiseMiddleware = (options?: CheckedPromiseMiddlewareOptions) => 
         const actStart = opts.onStart(message);
 
         if (_validAction(actStart)) {
-            Object.assign(actStart, <IPromiseActionPayload>{
+            Object.assign(actStart, <IPromiseAction>{
                 promiseActionType: action.type,
                 promiseActionEvent: 'OnStart',
                 promiseActionMessage: message,
@@ -59,7 +59,7 @@ const checkedPromiseMiddleware = (options?: CheckedPromiseMiddlewareOptions) => 
             if (enableProgress && _validFunction(opts.onEnd)) {
                 const actEnd = opts.onEnd();
                 if (_validAction(actEnd)) {
-                    Object.assign(actEnd, <IPromiseActionPayload>{
+                    Object.assign(actEnd, <IPromiseAction>{
                         promiseActionType: action.type,
                         promiseActionEvent: 'OnEnd'
                     });
@@ -77,7 +77,7 @@ const checkedPromiseMiddleware = (options?: CheckedPromiseMiddlewareOptions) => 
             if (_validFunction(opts.onError)) {
                 const actError = opts.onError(error);
                 if (_validAction(actError)) {
-                    Object.assign(actError, <IPromiseActionPayload>{
+                    Object.assign(actError, <IPromiseAction>{
                         promiseActionType: action.type,
                         promiseActionEvent: 'OnError',
                         promiseActionError: error
