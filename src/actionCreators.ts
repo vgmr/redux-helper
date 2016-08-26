@@ -38,12 +38,14 @@ export interface CreatePromiseActionOptions {
     message?: string
 }
 
-export interface PromiseAction extends Redux.Action {
-    promiseActionType?: string;
-    promiseActionEvent?: 'OnStart' | 'OnEnd' | 'OnError';
+export interface IPromiseActionPayload {
+    promiseActionType: string;
+    promiseActionEvent: 'OnStart' | 'OnEnd' | 'OnError';
     promiseActionMessage?: string,
     promiseActionError?: any;
 }
+
+export interface PromiseAction extends IPromiseActionPayload, Redux.Action { }
 
 export const createPromiseAction = <TParms, TResult>(
     actionName: string,
