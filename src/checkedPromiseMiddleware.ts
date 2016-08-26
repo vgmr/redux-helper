@@ -1,5 +1,5 @@
 import {Action, Dispatch, MiddlewareAPI} from 'redux';
-import {PromiseAction} from '../actions'
+import {PromiseAction} from './actionCreators'
 
 export interface CheckedPromiseMiddlewareOptions {
     onStart?: (message?: string) => Action;
