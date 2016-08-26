@@ -1,8 +1,9 @@
 import {Action, Dispatch, MiddlewareAPI} from 'redux';
+import {PromiseAction} from '../actions'
 
 export interface CheckedPromiseMiddlewareOptions {
-    onStart?: (message?: string, actionType?: string) => Action;
-    onEnd?: (actionType?: string) => Action;
+    onStart?: (message?: string) => Action;
+    onEnd?: () => Action;
     onError?: (error?: any) => Action;
     shouldExecute?: (state: any) => boolean;
 }
@@ -41,15 +42,22 @@ const checkedPromiseMiddleware = (options?: CheckedPromiseMiddlewareOptions) => 
     }
 
     if (enableProgress && _validFunction(opts.onStart)) {
-        const actStart = opts.onStart(message, action.type);
-        if (_validAction(actStart)) dispatch(actStart);
+        const actStart = opts.onStart(message);
+
+        if (_validAction(actStart)) {
+            Object.assign(actStart, <PromiseAction>{ promiseActionType: action.type, promiseActionEvent: 'OnStart' });
+            dispatch(actStart);
+        }
     }
 
     return promise.then(
         response => {
             if (enableProgress && _validFunction(opts.onEnd)) {
-                const actEnd = opts.onEnd(action.type);
-                if (_validAction(actEnd)) dispatch(actEnd);
+                const actEnd = opts.onEnd();
+                if (_validAction(actEnd)) {
+                    Object.assign(actEnd, <PromiseAction>{ promiseActionType: action.type, promiseActionEvent: 'OnEnd' });
+                    dispatch(actEnd);
+                }
             }
 
             const actResult = resultAction(response);
@@ -61,7 +69,10 @@ const checkedPromiseMiddleware = (options?: CheckedPromiseMiddlewareOptions) => 
         error => {
             if (_validFunction(opts.onError)) {
                 const actError = opts.onError(error);
-                if (_validAction(actError)) dispatch(actError);
+                if (_validAction(actError)) {
+                    Object.assign(actError, <PromiseAction>{ promiseActionType: action.type, promiseActionEvent: 'OnError' });
+                    dispatch(actError);
+                }
             }
         });
 }
