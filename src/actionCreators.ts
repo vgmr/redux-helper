@@ -23,10 +23,10 @@ export const createAction = <TPayload>(actionName: string): CreateAction<TPayloa
  */
 export interface CreatePromiseAction<TParms> {
     (parms?: TParms): Redux.Action;
-    matchAction?(action: PromiseAction): action is PromiseAction;
-    matchOnStart?(action: PromiseAction): action is PromiseAction;
-    matchOnEnd?(action: PromiseAction): action is PromiseAction;
-    matchOnError?(action: PromiseAction): action is PromiseAction;
+    matchAction?(action: any): action is PromiseAction;
+    matchOnStart?(action: any): action is PromiseAction;
+    matchOnEnd?(action: any): action is PromiseAction;
+    matchOnError?(action: any): action is PromiseAction;
 }
 
 /**
@@ -63,10 +63,10 @@ export const createPromiseAction = <TParms, TResult>(
         }
     )
 
-    create.matchAction = <TPayLoad>(action: PromiseAction): action is PromiseAction => action.promiseActionType === actionName;
-    create.matchOnStart = <TPayLoad>(action: PromiseAction): action is PromiseAction => action.promiseActionType === actionName && action.promiseActionEvent === 'OnStart';
-    create.matchOnEnd = <TPayLoad>(action: PromiseAction): action is PromiseAction => action.promiseActionType === actionName && action.promiseActionEvent === 'OnEnd';
-    create.matchOnError = <TPayLoad>(action: PromiseAction): action is PromiseAction => action.promiseActionType === actionName && action.promiseActionEvent === 'OnError';
+    create.matchAction = <TPayLoad>(action: any): action is PromiseAction => action.promiseActionType === actionName;
+    create.matchOnStart = <TPayLoad>(action: any): action is PromiseAction => action.promiseActionType === actionName && action.promiseActionEvent === 'OnStart';
+    create.matchOnEnd = <TPayLoad>(action: any): action is PromiseAction => action.promiseActionType === actionName && action.promiseActionEvent === 'OnEnd';
+    create.matchOnError = <TPayLoad>(action: any): action is PromiseAction => action.promiseActionType === actionName && action.promiseActionEvent === 'OnError';
     return create;
 }
 
