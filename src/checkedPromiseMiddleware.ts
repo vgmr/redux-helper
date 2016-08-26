@@ -1,4 +1,5 @@
 import {Action, Dispatch, MiddlewareAPI} from 'redux';
+import {PromiseAction} from './actionCreators'
 
 export interface CheckedPromiseMiddlewareOptions {
     onStart?: (message?: string) => Action;
@@ -18,7 +19,7 @@ const _validAction = (object: any): object is Action => {
         typeof object.type === "string";
 }
 
-const checkedPromiseMiddleware = (options?: CheckedPromiseMiddlewareOptions) => (midlapi : MiddlewareAPI<any>) => (next: Dispatch<any>) => (action: any) => {
+const checkedPromiseMiddleware = (options?: CheckedPromiseMiddlewareOptions) => (midlapi: MiddlewareAPI<any>) => (next: Dispatch<any>) => (action: any) => {
     if (!action || !action.payload) return next(action);
     let opts = options || {};
     const {
@@ -29,34 +30,49 @@ const checkedPromiseMiddleware = (options?: CheckedPromiseMiddlewareOptions) => 
         resultAction
     } = action.payload;
 
-    if (!promise || typeof promise.then !== 'function' || !resultAction) {
+    if (!promise || typeof promise.then !== 'function' || !_validFunction(resultAction)) {
         return next(action);
     }
 
     const {dispatch, getState} = midlapi;
-    
+
     if (checkExecution && _validFunction(opts.shouldExecute) && !opts.shouldExecute(getState())) {
+        console.log('discarding action ' + action.type);
         return;
     }
 
     if (enableProgress && _validFunction(opts.onStart)) {
         const actStart = opts.onStart(message);
-        if (_validAction(actStart)) dispatch(actStart);
+
+        if (_validAction(actStart)) {
+            Object.assign(actStart, <PromiseAction>{ promiseActionType: action.type, promiseActionEvent: 'OnStart' });
+            dispatch(actStart);
+        }
     }
 
     return promise.then(
         response => {
-            resultAction && dispatch(resultAction(response))
+            if (enableProgress && _validFunction(opts.onEnd)) {
+                const actEnd = opts.onEnd();
+                if (_validAction(actEnd)) {
+                    Object.assign(actEnd, <PromiseAction>{ promiseActionType: action.type, promiseActionEvent: 'OnEnd' });
+                    dispatch(actEnd);
+                }
+            }
+
+            const actResult = resultAction(response);
+            if (!_validAction(actResult))
+                throw new Error(`Action "${action.type}" - result is not an action!`);
+            else
+                dispatch(actResult);
         },
         error => {
             if (_validFunction(opts.onError)) {
-                const actToDispatch = opts.onError(error);
-                if (_validAction(actToDispatch)) dispatch(actToDispatch);
-            }
-        }).then(() => {
-            if (enableProgress && _validFunction(opts.onEnd)) {
-                const actEnd = opts.onEnd();
-                if (_validAction(actEnd)) dispatch(actEnd);
+                const actError = opts.onError(error);
+                if (_validAction(actError)) {
+                    Object.assign(actError, <PromiseAction>{ promiseActionType: action.type, promiseActionEvent: 'OnError' });
+                    dispatch(actError);
+                }
             }
         });
 }
