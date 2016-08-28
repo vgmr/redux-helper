@@ -1,56 +1,89 @@
-import * as Redux from 'redux';
+import {Action, Dispatch, MiddlewareAPI} from 'redux';
+import {PromiseAction, IPromiseAction} from './actionCreators'
 
 export interface CheckedPromiseMiddlewareOptions {
-    onError?: (error?: any, dispatch?: Redux.Dispatch<any>) => (void | Redux.Action);
-    onStart?: (message?: string) => Redux.Action;
-    onEnd?: () => Redux.Action;
-    shouldExecute?: (getState: any) => boolean;
+    onStart?: (message?: string) => Action;
+    onEnd?: () => Action;
+    onError?: (error?: any) => Action;
+    shouldExecute?: (state: any) => boolean;
 }
 
 const _validFunction = (obj: any): boolean => {
     return obj && typeof obj === 'function';
 }
 
-const checkedPromiseMiddleware = (options?: CheckedPromiseMiddlewareOptions) => (middleware:any) => (next: Redux.Dispatch<any>) => (action: any) => {
-    const {dispatch,getState} = middleware;
-    
-    let opts = options || {};
+const _validAction = (object: any): object is Action => {
+    return object && object instanceof Object &&
+        !(object instanceof Array) &&
+        typeof object !== "function" &&
+        typeof object.type === "string";
+}
 
+const checkedPromiseMiddleware = (options?: CheckedPromiseMiddlewareOptions) => (midlapi: MiddlewareAPI<any>) => (next: Dispatch<any>) => (action: any) => {
     if (!action || !action.payload) return next(action);
+    let opts = options || {};
     const {
         checkExecution = false,
         enableProgress = true,
         message = 'loading',
-        promise,
+        promise = undefined as Promise<any>,
         resultAction
     } = action.payload;
 
-    if (!promise || (typeof promise.then !== 'function' || !resultAction)) {
+    if (!promise || typeof promise.then !== 'function' || !_validFunction(resultAction)) {
         return next(action);
     }
 
-    if (checkExecution && _validFunction(opts.shouldExecute) && !opts.shouldExecute(getState)) {
-        console.log('check status prevent dispatch!');
+    const {dispatch, getState} = midlapi;
+
+    if (checkExecution && _validFunction(opts.shouldExecute) && !opts.shouldExecute(getState())) {
+        console.log('discarding action ' + action.type);
         return;
     }
 
     if (enableProgress && _validFunction(opts.onStart)) {
-        let actStart = opts.onStart(message);
-        if (actStart) dispatch(actStart);
+        const actStart = opts.onStart(message);
+
+        if (_validAction(actStart)) {
+            Object.assign(actStart, <IPromiseAction>{
+                promiseActionType: action.type,
+                promiseActionEvent: 'OnStart',
+                promiseActionMessage: message,
+            });
+            dispatch(actStart);
+        }
     }
 
-    promise
-        .then(res => resultAction && dispatch(resultAction(res)))
-        .catch((err) => {
-            if (_validFunction(opts.onError)) {
-                let actToDispatch = opts.onError(err, dispatch);
-                if (actToDispatch) dispatch(actToDispatch);
-            }
-        })
-        .then(() => {
+    return promise.then(
+        response => {
             if (enableProgress && _validFunction(opts.onEnd)) {
-                let actEnd = opts.onEnd();
-                if (actEnd) dispatch(actEnd);
+                const actEnd = opts.onEnd();
+                if (_validAction(actEnd)) {
+                    Object.assign(actEnd, <IPromiseAction>{
+                        promiseActionType: action.type,
+                        promiseActionEvent: 'OnEnd'
+                    });
+                    dispatch(actEnd);
+                }
+            }
+
+            const actResult = resultAction(response);
+            if (!_validAction(actResult))
+                throw new Error(`Action "${action.type}" - result is not an action!`);
+            else
+                dispatch(actResult);
+        },
+        error => {
+            if (_validFunction(opts.onError)) {
+                const actError = opts.onError(error);
+                if (_validAction(actError)) {
+                    Object.assign(actError, <IPromiseAction>{
+                        promiseActionType: action.type,
+                        promiseActionEvent: 'OnError',
+                        promiseActionError: error
+                    });
+                    dispatch(actError);
+                }
             }
         });
 }

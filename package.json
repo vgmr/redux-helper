@@ -1,26 +1,31 @@
 {
   "name": "redux-helper",
-  "version": "0.0.20",
+  "version": "0.0.38",
   "description": "Redux reducer and action helper",
+  "repository": "https://github.com/vgmr/redux-helper/",
   "private": false,
   "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
   "typings": "dist/index.d.ts",
   "devDependencies": {
     "babel-cli": "^6.11.4",
     "babel-plugin-transform-es2015-parameters": "^6.11.4",
     "babel-plugin-transform-object-assign": "^6.8.0",
+    "babel-preset-es2015": "^6.13.2",
     "expect": "^1.20.2",
     "jsdom": "^9.4.1",
-    "mocha": "^2.5.3",
-    "react-ts-scripts": "0.1.17",
-    "ts-node": "^1.2.1"
+    "mocha": "^3.0.2",
+    "rimraf": "^2.5.4",
+    "ts-node": "^1.2.3"
   },
   "dependencies": {
     "redux": "^3.5.2"
   },
   "scripts": {
-    "release": "npm test && npm run build && npm version patch && npm publish",
-    "build": "tsc",
+    "release": "npm run build && npm version patch && npm publish",
+    "build": "rimraf dist && tsc",
     "postbuild": "babel dist -d dist",
     "test": "mocha test/config/testSetup.js --opts test/config/mocha.opts"
   }

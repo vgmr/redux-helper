@@ -8,7 +8,7 @@ export interface Action<TPayload> extends Redux.Action {
  * Plain Action creator
  */
 export interface CreateAction<TPayload> {
-    (payload?: TPayload): ({ type: string, payload: TPayload });
+    (payload?: TPayload): Action<TPayload>;
     matchAction?(action: Redux.Action): action is Action<TPayload>;
 }
 
@@ -19,25 +19,65 @@ export const createAction = <TPayload>(actionName: string): CreateAction<TPayloa
 }
 
 /**
- * Checked Action Interface and Creator
+ * Promise Action Interface and Creator
  */
-export interface CheckedActionOptions {
-    checkStatus?: boolean,
-    loadingMessage?: string,
+export interface CreatePromiseAction<TParms> {
+    (parms?: TParms): Redux.Action;
+    matchAction?(action: Redux.Action): action is PromiseAction;
+    matchOnStart?(action: Redux.Action): action is PromiseAction;
+    matchOnEnd?(action: Redux.Action): action is PromiseAction;
+    matchOnError?(action: Redux.Action): action is PromiseAction;
 }
 
-export const createCheckedAction = <TParms, TResult>(
+/**
+ * Promise Action Options
+ */
+export interface CreatePromiseActionOptions {
+    checkExecution?: boolean,
+    enableProgress?: boolean,
+    message?: string
+}
+
+export interface IPromiseAction {
+    promiseActionType: string;
+    promiseActionEvent: 'OnStart' | 'OnEnd' | 'OnError';
+    promiseActionMessage?: string,
+    promiseActionError?: any;
+}
+
+export interface PromiseAction extends IPromiseAction, Redux.Action { }
+
+export const createPromiseAction = <TParms, TResult>(
     actionName: string,
     promise: (parms: TParms) => Promise<TResult>,
-    resultAction: (res: TResult) => void,
-    opts?: CheckedActionOptions) => (parms?: TParms) =>
-        (
-            {
-                type: actionName,
-                payload: Object.assign({}, opts, {
-                    promise: promise(parms),
-                    resultAction: resultAction
-                })
-            }
-        );
+    resultAction: (res: TResult) => Redux.Action,
+    options?: CreatePromiseActionOptions): CreatePromiseAction<TParms> => {
+
+    let create: CreatePromiseAction<TParms> = (parms?: TParms) => (
+        {
+            type: actionName,
+            payload: Object.assign({}, options, {
+                promise: promise(parms),
+                resultAction: resultAction
+            })
+        }
+    )
+
+    create.matchAction = <TPayLoad>(action: Redux.Action): action is PromiseAction =>
+        (<PromiseAction>action).promiseActionType === actionName;
+
+    create.matchOnStart = <TPayLoad>(action: Redux.Action): action is PromiseAction =>
+        (<PromiseAction>action).promiseActionType === actionName && 
+        (<PromiseAction>action).promiseActionEvent === 'OnStart';
+
+    create.matchOnEnd = <TPayLoad>(action: Redux.Action): action is PromiseAction =>
+        (<PromiseAction>action).promiseActionType === actionName && 
+        (<PromiseAction>action).promiseActionEvent === 'OnEnd';
+
+    create.matchOnError = <TPayLoad>(action: Redux.Action): action is PromiseAction => 
+        (<PromiseAction>action).promiseActionType === actionName && 
+        (<PromiseAction>action).promiseActionEvent === 'OnError';
+        
+    return create;
+}
 

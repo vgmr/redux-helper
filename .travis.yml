@@ -1,0 +1,12 @@
+---
+language: node_js
+node_js:
+  - 4
+  - 6
+cache:
+  directories:
+  - global-cli/node_modules
+  - node_modules
+before_script:
+  - npm install -g typescript
+script: npm run build
