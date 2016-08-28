@@ -2,6 +2,7 @@ import {createAction,
     createPromiseAction,
     CreateAction,
     CreatePromiseActionOptions,
+    CreatePromiseAction,
     Action} from './actionCreators';
 
 import checkedPromiseMiddleware, {CheckedPromiseMiddlewareOptions} from './checkedPromiseMiddleware';
@@ -14,6 +15,7 @@ export {
     CheckedPromiseMiddlewareOptions,
     createAction,
     createPromiseAction,
+    CreatePromiseAction,
     CreateAction,
     CreatePromiseActionOptions
 }
