@@ -1,5 +1,5 @@
 import {Action, Dispatch, MiddlewareAPI} from 'redux';
-import {PromiseAction} from './actionCreators'
+import {PromiseAction, IPromiseAction} from './actionCreators'
 
 export interface CheckedPromiseMiddlewareOptions {
     onStart?: (message?: string) => Action;
@@ -45,7 +45,11 @@ const checkedPromiseMiddleware = (options?: CheckedPromiseMiddlewareOptions) => 
         const actStart = opts.onStart(message);
 
         if (_validAction(actStart)) {
-            Object.assign(actStart, <PromiseAction>{ promiseActionType: action.type, promiseActionEvent: 'OnStart' });
+            Object.assign(actStart, <IPromiseAction>{
+                promiseActionType: action.type,
+                promiseActionEvent: 'OnStart',
+                promiseActionMessage: message,
+            });
             dispatch(actStart);
         }
     }
@@ -55,7 +59,10 @@ const checkedPromiseMiddleware = (options?: CheckedPromiseMiddlewareOptions) => 
             if (enableProgress && _validFunction(opts.onEnd)) {
                 const actEnd = opts.onEnd();
                 if (_validAction(actEnd)) {
-                    Object.assign(actEnd, <PromiseAction>{ promiseActionType: action.type, promiseActionEvent: 'OnEnd' });
+                    Object.assign(actEnd, <IPromiseAction>{
+                        promiseActionType: action.type,
+                        promiseActionEvent: 'OnEnd'
+                    });
                     dispatch(actEnd);
                 }
             }
@@ -70,7 +77,11 @@ const checkedPromiseMiddleware = (options?: CheckedPromiseMiddlewareOptions) => 
             if (_validFunction(opts.onError)) {
                 const actError = opts.onError(error);
                 if (_validAction(actError)) {
-                    Object.assign(actError, <PromiseAction>{ promiseActionType: action.type, promiseActionEvent: 'OnError' });
+                    Object.assign(actError, <IPromiseAction>{
+                        promiseActionType: action.type,
+                        promiseActionEvent: 'OnError',
+                        promiseActionError: error
+                    });
                     dispatch(actError);
                 }
             }
