@@ -50,13 +50,14 @@ export interface PromiseAction extends IPromiseAction, Redux.Action { }
 export const createPromiseAction = <TParms, TResult>(
     actionName: string,
     promise: (parms: TParms) => Promise<TResult>,
-    resultAction: (res: TResult) => Redux.Action,
+    resultAction: (res: TResult, parms?: TParms) => Redux.Action,
     options?: CreatePromiseActionOptions): CreatePromiseAction<TParms> => {
 
     let create: CreatePromiseAction<TParms> = (parms?: TParms) => (
         {
             type: actionName,
             payload: Object.assign({}, options, {
+                promiseParms: parms,
                 promise: promise(parms),
                 resultAction: resultAction
             })
