@@ -1,5 +1,8 @@
 import * as Redux from 'redux';
 
+/**
+ * Action Interface
+ */
 export interface Action<TPayload> extends Redux.Action {
     payload: TPayload
 }
