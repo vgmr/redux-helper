@@ -26,6 +26,7 @@ const checkedPromiseMiddleware = (options?: CheckedPromiseMiddlewareOptions) => 
         checkExecution = false,
         enableProgress = true,
         message = 'loading',
+        promiseParms,
         promise = undefined as Promise<any>,
         resultAction
     } = action.payload;
@@ -67,7 +68,7 @@ const checkedPromiseMiddleware = (options?: CheckedPromiseMiddlewareOptions) => 
                 }
             }
 
-            const actResult = resultAction(response);
+            const actResult = resultAction(response, promiseParms);
             if (!_validAction(actResult))
                 throw new Error(`Action "${action.type}" - result is not an action!`);
             else
