@@ -53,12 +53,13 @@ export interface PromiseAction extends IPromiseAction, Redux.Action { }
 export const createPromiseAction = <TParms, TResult>(
     actionName: string,
     promise: (parms: TParms) => Promise<TResult>,
-    resultAction: (res: TResult, parms?: TParms) => Redux.Action,
+    resultAction: (res: TResult, parms?: TParms) => any,
     options?: CreatePromiseActionOptions): CreatePromiseAction<TParms> => {
 
     let create: CreatePromiseAction<TParms> = (parms?: TParms) => (
         {
             type: actionName,
+            isPromiseAction: true,
             payload: Object.assign({}, options, {
                 promiseParms: parms,
                 promise: promise(parms),
@@ -71,16 +72,16 @@ export const createPromiseAction = <TParms, TResult>(
         (<PromiseAction>action).promiseActionType === actionName;
 
     create.matchOnStart = <TPayLoad>(action: Redux.Action): action is PromiseAction =>
-        (<PromiseAction>action).promiseActionType === actionName && 
+        (<PromiseAction>action).promiseActionType === actionName &&
         (<PromiseAction>action).promiseActionEvent === 'OnStart';
 
     create.matchOnEnd = <TPayLoad>(action: Redux.Action): action is PromiseAction =>
-        (<PromiseAction>action).promiseActionType === actionName && 
+        (<PromiseAction>action).promiseActionType === actionName &&
         (<PromiseAction>action).promiseActionEvent === 'OnEnd';
 
-    create.matchOnError = <TPayLoad>(action: Redux.Action): action is PromiseAction => 
-        (<PromiseAction>action).promiseActionType === actionName && 
+    create.matchOnError = <TPayLoad>(action: Redux.Action): action is PromiseAction =>
+        (<PromiseAction>action).promiseActionType === actionName &&
         (<PromiseAction>action).promiseActionEvent === 'OnError';
-        
+
     return create;
 }

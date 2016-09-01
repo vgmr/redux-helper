@@ -20,7 +20,7 @@ const _validAction = (object: any): object is Action => {
 }
 
 const checkedPromiseMiddleware = (options?: CheckedPromiseMiddlewareOptions) => (midlapi: MiddlewareAPI<any>) => (next: Dispatch<any>) => (action: any) => {
-    if (!action || !action.payload) return next(action);
+    if (!action || !action.isPromiseAction || !action.payload) return next(action);
     let opts = options || {};
     const {
         checkExecution = false,
@@ -69,10 +69,7 @@ const checkedPromiseMiddleware = (options?: CheckedPromiseMiddlewareOptions) => 
             }
 
             const actResult = resultAction(response, promiseParms);
-            if (!_validAction(actResult))
-                throw new Error(`Action "${action.type}" - result is not an action!`);
-            else
-                dispatch(actResult);
+            dispatch(actResult);
         },
         error => {
             if (_validFunction(opts.onError)) {
