@@ -1,11 +1,15 @@
-import {createAction,
-    createPromiseAction,
+import {
+    Action,
+    createAction,
     CreateAction,
-    CreatePromiseActionOptions,
     CreatePromiseAction,
-    Action} from './actionCreators';
+    CreatePromiseActionOptions,
+    createPromiseAction,
+    createPromiseThunkAction,
+    createPromiseWithThunkAction
+} from './actionCreators';
 
-import checkedPromiseMiddleware, {CheckedPromiseMiddlewareOptions} from './checkedPromiseMiddleware';
+import checkedPromiseMiddleware, { CheckedPromiseMiddlewareOptions } from './checkedPromiseMiddleware';
 
 export default checkedPromiseMiddleware;
 
@@ -14,8 +18,10 @@ export {
     checkedPromiseMiddleware,
     CheckedPromiseMiddlewareOptions,
     createAction,
-    createPromiseAction,
-    CreatePromiseAction,
     CreateAction,
-    CreatePromiseActionOptions
+    CreatePromiseAction,
+    CreatePromiseActionOptions,
+    createPromiseAction,
+    createPromiseThunkAction,
+    createPromiseWithThunkAction
 }
