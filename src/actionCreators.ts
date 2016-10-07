@@ -85,3 +85,24 @@ export const createPromiseAction = <TParms, TResult>(
 
     return create;
 }
+
+export function createPromiseThunkAction<TParms, TResult>(
+    type: string,
+    promise: (arg: TParms) => Promise<TResult>,
+    afterResultThunk: (dispatch: Redux.Dispatch<any>, getState: () => any, res: TResult, parms?: TParms) => void) {
+    return createPromiseWithThunkAction(type, promise, undefined, afterResultThunk);
+}
+
+export function createPromiseWithThunkAction<TParms, TResult>(
+    type: string,
+    promise: (arg: TParms) => Promise<TResult>,
+    resultAction: (res: TResult, parms?: TParms) => any,
+    afterResultThunk: (dispatch: Redux.Dispatch<any>, getState: () => any, res: TResult, parms?: TParms) => void) {
+
+    const thunkAction = (res: TResult, parms?: TParms) => (dispatch, getState) => {
+        if (resultAction) dispatch(resultAction(res));
+        if (afterResultThunk) afterResultThunk(dispatch, getState, res, parms);
+    }
+
+    return createPromiseAction(type, promise, thunkAction);
+}
