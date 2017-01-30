@@ -10,7 +10,6 @@
         "noImplicitAny": true
     },
     "files": [
-        "src/index.ts",
-        "test/test.test.ts"
+        "src/index.ts"
     ]
 }
