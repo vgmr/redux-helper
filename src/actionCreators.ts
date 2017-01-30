@@ -12,13 +12,13 @@ export interface Action<TPayload> extends Redux.Action {
  */
 export interface CreateAction<TPayload> {
     (payload?: TPayload): Action<TPayload>;
-    matchAction?(action: Redux.Action): action is Action<TPayload>;
+    matchAction(action: Redux.Action): action is Action<TPayload>;
 }
 
 export const createAction = <TPayload>(actionName: string): CreateAction<TPayload> => {
-    let create: CreateAction<TPayload> = <TPayload>(payload?: TPayload) => ({ type: actionName, payload: payload });
+    let create: any = <TPayload>(payload?: TPayload) => ({ type: actionName, payload: payload });
     create.matchAction = <TPayLoad>(action: Redux.Action): action is Action<TPayload> => action.type === actionName;
-    return create;
+    return <CreateAction<TPayload>> create;
 }
 
 /**
@@ -26,10 +26,10 @@ export const createAction = <TPayload>(actionName: string): CreateAction<TPayloa
  */
 export interface CreatePromiseAction<TParms> {
     (parms?: TParms): Redux.Action;
-    matchAction?(action: Redux.Action): action is PromiseAction;
-    matchOnStart?(action: Redux.Action): action is PromiseAction;
-    matchOnEnd?(action: Redux.Action): action is PromiseAction;
-    matchOnError?(action: Redux.Action): action is PromiseAction;
+    matchAction(action: Redux.Action): action is PromiseAction;
+    matchOnStart(action: Redux.Action): action is PromiseAction;
+    matchOnEnd(action: Redux.Action): action is PromiseAction;
+    matchOnError(action: Redux.Action): action is PromiseAction;
 }
 
 /**
@@ -56,7 +56,7 @@ export const createPromiseAction = <TParms, TResult>(
     resultAction: (res: TResult, parms?: TParms) => any,
     options?: CreatePromiseActionOptions): CreatePromiseAction<TParms> => {
 
-    let create: CreatePromiseAction<TParms> = (parms?: TParms) => (
+    let create: any = (parms?: TParms) => (
         {
             type: actionName,
             isPromiseAction: true,
@@ -83,7 +83,7 @@ export const createPromiseAction = <TParms, TResult>(
         (<PromiseAction>action).promiseActionType === actionName &&
         (<PromiseAction>action).promiseActionEvent === 'OnError';
 
-    return create;
+    return <CreatePromiseAction<TParms>> create;
 }
 
 export function createPromiseThunkAction<TParms, TResult>(
