@@ -52,7 +52,7 @@ export interface PromiseAction extends IPromiseAction, Redux.Action { }
 
 export const createPromiseAction = <TParms, TResult>(
     actionName: string,
-    promise: (parms: TParms) => Promise<TResult>,
+    promise: (parms: TParms | undefined) => Promise<TResult>,
     resultAction: (res: TResult, parms?: TParms) => any,
     options?: CreatePromiseActionOptions): CreatePromiseAction<TParms> => {
 
@@ -96,10 +96,10 @@ export function createPromiseThunkAction<TParms, TResult>(
 export function createPromiseWithThunkAction<TParms, TResult>(
     type: string,
     promise: (arg: TParms) => Promise<TResult>,
-    resultAction: (res: TResult, parms?: TParms) => any,
+    resultAction: ((res: TResult, parms?: TParms | undefined) => any) | undefined,
     afterResultThunk: (dispatch: Redux.Dispatch<any>, getState: () => any, res: TResult, parms?: TParms) => void) {
 
-    const thunkAction = (res: TResult, parms?: TParms) => (dispatch, getState) => {
+    const thunkAction = (res: TResult, parms?: TParms) => (dispatch: Redux.Dispatch<any>, getState: () => any) => {
         if (resultAction) dispatch(resultAction(res));
         if (afterResultThunk) afterResultThunk(dispatch, getState, res, parms);
     }

@@ -8,7 +8,7 @@ export interface CheckedPromiseMiddlewareOptions {
     shouldExecute?: (state: any) => boolean;
 }
 
-const _validFunction = (obj: any): boolean => {
+const _validFunction = (obj: any): obj is Function => {
     return obj && typeof obj === 'function';
 }
 
@@ -27,7 +27,7 @@ const checkedPromiseMiddleware = (options?: CheckedPromiseMiddlewareOptions) => 
         enableProgress = true,
         message = 'loading',
         promiseParms,
-        promise = undefined as Promise<any>,
+        promise  = undefined as Promise<any> | undefined,
         resultAction
     } = action.payload;
 

@@ -5,7 +5,9 @@
         "jsx": "react",
         "sourceMap": true,
         "declaration": true,
-        "outDir": "dist"
+        "outDir": "dist",
+        "strictNullChecks": true,
+        "noImplicitAny": true
     },
     "files": [
         "src/index.ts"
