@@ -24,6 +24,22 @@ describe('Action Creators', () => {
         expect(simpleAction.matchAction(act2)).toEqual(false);
     })
 
+    it('createAction.typeCreated', () => {
+        const simpleAction = lib.createAction<string>('TEST_ACTION');
+
+        expect(simpleAction.typeCreated).toEqual('TEST_ACTION');
+    })
+
+    it('createPromiseAction.typeCreated', () => {
+        const resultAction = lib.createAction<string>('RESULT_ACTION');
+        const promiseAction = lib.createPromiseAction<string, string>(
+            'TEST_PROMISE_ACTION',
+            (value) => Promise.resolve('value'),
+            resultAction);
+
+        expect(promiseAction.typeCreated).toEqual('TEST_PROMISE_ACTION');
+    })
+
 });
 
 
