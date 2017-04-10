@@ -13,14 +13,23 @@ export interface Action<TPayload> extends Redux.Action {
 export interface CreateAction<TPayload> {
     (payload?: TPayload): Action<TPayload>;
     matchAction(action: Redux.Action): action is Action<TPayload>;
-    typeCreated: string;
+    containsPromiseAction(action: Redux.Action): action is PromiseAction;
+    type: string;
 }
 
-export const createAction = <TPayload>(actionName: string): CreateAction<TPayload> => {
-    let create: any = <TPayload>(payload?: TPayload) => ({ type: actionName, payload: payload });
-    create.matchAction = <TPayLoad>(action: Redux.Action): action is Action<TPayload> => action.type === actionName;
-    create.typeCreated = actionName;
-    return <CreateAction<TPayload>> create;
+export const createAction = <TPayload>(type: string): CreateAction<TPayload> => {
+    let create: any = <TPayload>(payload?: TPayload) => ({ type: type, payload: payload });
+
+    create.matchAction = <TPayLoad>(action: Redux.Action): action is Action<TPayload> => {
+        return action.type === type
+    };
+
+    create.containsPromiseAction = <TPayLoad>(action: Redux.Action): action is PromiseAction => {
+        return action.type === type && (<PromiseAction>action).promiseActionType != null;
+    };
+
+    create.type = type;
+    return <CreateAction<TPayload>>create;
 }
 
 /**
@@ -32,7 +41,7 @@ export interface CreatePromiseAction<TParms> {
     matchOnStart(action: Redux.Action): action is PromiseAction;
     matchOnEnd(action: Redux.Action): action is PromiseAction;
     matchOnError(action: Redux.Action): action is PromiseAction;
-    typeCreated: string;
+    type: string;
 }
 
 /**
@@ -54,14 +63,14 @@ export interface IPromiseAction {
 export interface PromiseAction extends IPromiseAction, Redux.Action { }
 
 export const createPromiseAction = <TParms, TResult>(
-    actionName: string,
+    type: string,
     promise: (parms: TParms | undefined) => Promise<TResult>,
     resultAction: (res: TResult, parms?: TParms) => any,
     options?: CreatePromiseActionOptions): CreatePromiseAction<TParms> => {
 
     let create: any = (parms?: TParms) => (
         {
-            type: actionName,
+            type: type,
             isPromiseAction: true,
             payload: Object.assign({}, options, {
                 promiseParms: parms,
@@ -72,23 +81,22 @@ export const createPromiseAction = <TParms, TResult>(
     )
 
     create.matchAction = <TPayLoad>(action: Redux.Action): action is PromiseAction =>
-        (<PromiseAction>action).promiseActionType === actionName;
+        (<PromiseAction>action).promiseActionType === type;
 
     create.matchOnStart = <TPayLoad>(action: Redux.Action): action is PromiseAction =>
-        (<PromiseAction>action).promiseActionType === actionName &&
+        (<PromiseAction>action).promiseActionType === type &&
         (<PromiseAction>action).promiseActionEvent === 'OnStart';
 
     create.matchOnEnd = <TPayLoad>(action: Redux.Action): action is PromiseAction =>
-        (<PromiseAction>action).promiseActionType === actionName &&
+        (<PromiseAction>action).promiseActionType === type &&
         (<PromiseAction>action).promiseActionEvent === 'OnEnd';
 
     create.matchOnError = <TPayLoad>(action: Redux.Action): action is PromiseAction =>
-        (<PromiseAction>action).promiseActionType === actionName &&
+        (<PromiseAction>action).promiseActionType === type &&
         (<PromiseAction>action).promiseActionEvent === 'OnError';
 
-    create.typeCreated = actionName;
-
-    return <CreatePromiseAction<TParms>> create;
+    create.type = type;
+    return <CreatePromiseAction<TParms>>create;
 }
 
 export function createPromiseThunkAction<TParms, TResult>(
