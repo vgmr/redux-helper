@@ -1,5 +1,5 @@
-import {Action, Dispatch, MiddlewareAPI} from 'redux';
-import {PromiseAction, IPromiseAction} from './actionCreators'
+import { Action, Dispatch, MiddlewareAPI } from 'redux';
+import { PromiseAction, IPromiseAction } from './actionCreators'
 
 export interface CheckedPromiseMiddlewareOptions {
     onStart?: (message?: string) => Action;
@@ -27,7 +27,7 @@ const checkedPromiseMiddleware = (options?: CheckedPromiseMiddlewareOptions) => 
         enableProgress = true,
         message = 'loading',
         promiseParms,
-        promise  = undefined as Promise<any> | undefined,
+        promise = undefined as Promise<any> | undefined,
         resultAction
     } = action.payload;
 
@@ -35,7 +35,7 @@ const checkedPromiseMiddleware = (options?: CheckedPromiseMiddlewareOptions) => 
         return next(action);
     }
 
-    const {dispatch, getState} = midlapi;
+    const { dispatch, getState } = midlapi;
 
     if (checkExecution && _validFunction(opts.shouldExecute) && !opts.shouldExecute(getState())) {
         console.log('discarding action ' + action.type);
@@ -85,6 +85,5 @@ const checkedPromiseMiddleware = (options?: CheckedPromiseMiddlewareOptions) => 
             }
         });
 }
-
 
 export default checkedPromiseMiddleware;
