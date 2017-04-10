@@ -13,11 +13,13 @@ export interface Action<TPayload> extends Redux.Action {
 export interface CreateAction<TPayload> {
     (payload?: TPayload): Action<TPayload>;
     matchAction(action: Redux.Action): action is Action<TPayload>;
+    typeCreated: string;
 }
 
 export const createAction = <TPayload>(actionName: string): CreateAction<TPayload> => {
     let create: any = <TPayload>(payload?: TPayload) => ({ type: actionName, payload: payload });
     create.matchAction = <TPayLoad>(action: Redux.Action): action is Action<TPayload> => action.type === actionName;
+    create.typeCreated = actionName;
     return <CreateAction<TPayload>> create;
 }
 
@@ -30,6 +32,7 @@ export interface CreatePromiseAction<TParms> {
     matchOnStart(action: Redux.Action): action is PromiseAction;
     matchOnEnd(action: Redux.Action): action is PromiseAction;
     matchOnError(action: Redux.Action): action is PromiseAction;
+    typeCreated: string;
 }
 
 /**
@@ -82,6 +85,8 @@ export const createPromiseAction = <TParms, TResult>(
     create.matchOnError = <TPayLoad>(action: Redux.Action): action is PromiseAction =>
         (<PromiseAction>action).promiseActionType === actionName &&
         (<PromiseAction>action).promiseActionEvent === 'OnError';
+
+    create.typeCreated = actionName;
 
     return <CreatePromiseAction<TParms>> create;
 }
