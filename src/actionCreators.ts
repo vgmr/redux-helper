@@ -138,6 +138,5 @@ export function createPromiseWithThunkAction<TParms, TResult>(
         if (resultAction) dispatch(resultAction(res));
         if (afterResultThunk) afterResultThunk(dispatch, getState, res, parms);
     }
-
     return createPromiseAction(type, promise, thunkAction);
 }
