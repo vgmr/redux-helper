@@ -35,7 +35,7 @@ export interface Action<TPayload> extends Redux.Action {
 export interface CreateAction<TPayload> {
     (payload?: TPayload): Action<TPayload>;
     matchAction(action: Redux.Action): action is Action<TPayload>;
-    containsPromiseAction(action: Redux.Action): action is PromiseAction;
+    matchAsLinkedPromiseAction(action: Redux.Action): action is PromiseAction;
     type: string;
 }
 
@@ -46,7 +46,7 @@ export const createAction = <TPayload>(type: string): CreateAction<TPayload> => 
         return action.type === type
     };
 
-    create.containsPromiseAction = <TPayLoad>(action: Redux.Action): action is PromiseAction => {
+    create.matchAsLinkedPromiseAction = <TPayLoad>(action: Redux.Action): action is PromiseAction => {
         return action.type === type && (<PromiseAction>action).promiseActionType != null;
     };
 
