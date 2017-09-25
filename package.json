@@ -1,6 +1,11 @@
 {
   "name": "redux-helper",
+<<<<<<< HEAD
   "version": "0.0.48",
+=======
+  "version": "0.0.55",
+  "license": "MIT",
+>>>>>>> 0e4b7bd69d05006f4732cee4f744bb27ac3a4edc
   "description": "Redux reducer and action helper",
   "repository": "https://github.com/vgmr/redux-helper/",
   "private": false,
@@ -21,7 +26,7 @@
     "jsdom": "^9.4.1",
     "mocha": "^3.0.2",
     "rimraf": "^2.5.4",
-    "ts-node": "^2.0.0"
+    "ts-node": "^3.0.2"
   },
   "dependencies": {
     "redux": "^3.5.2"
