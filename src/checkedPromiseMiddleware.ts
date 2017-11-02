@@ -72,19 +72,21 @@ const checkedPromiseMiddleware = (options?: CheckedPromiseMiddlewareOptions) => 
                 promiseActionType: action.type,
                 promiseActionEvent: 'OnStart',
                 promiseActionMessage: message,
+                promiseActionParams: promiseParms,
             });
             dispatch(actStart);
         }
     }
 
     return promise.then(
-        response => {
+        (response: any) => {
             if (enableProgress && _validFunction(opts.onEnd)) {
                 const actEnd = opts.onEnd();
                 if (_validAction(actEnd)) {
                     Object.assign(actEnd, <IPromiseAction>{
                         promiseActionType: action.type,
-                        promiseActionEvent: 'OnEnd'
+                        promiseActionEvent: 'OnEnd',
+                        promiseActionParams: promiseParms,
                     });
                     dispatch(actEnd);
                 }
@@ -93,14 +95,15 @@ const checkedPromiseMiddleware = (options?: CheckedPromiseMiddlewareOptions) => 
             const actResult = resultAction(response, promiseParms);
             dispatch(actResult);
         },
-        error => {
+        (error: any) => {
             if (_validFunction(opts.onError)) {
                 const actError = opts.onError(error);
                 if (_validAction(actError)) {
                     Object.assign(actError, <IPromiseAction>{
                         promiseActionType: action.type,
                         promiseActionEvent: 'OnError',
-                        promiseActionError: error
+                        promiseActionError: error,
+                        promiseActionParams: promiseParms,
                     });
                     dispatch(actError);
                 }
