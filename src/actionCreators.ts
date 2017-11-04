@@ -33,7 +33,8 @@ export interface Action<TPayload> extends Redux.Action {
  * Plain Action creator
  */
 export interface CreateAction<TPayload> {
-    (payload?: TPayload): Action<TPayload>;
+    (): Redux.Action;
+    (payload: TPayload): Action<TPayload>;
     matchAction(action: Redux.Action): action is Action<TPayload>;
     matchAsLinkedPromiseAction(action: Redux.Action): action is PromiseAction<TPayload>;
     type: string;
@@ -51,14 +52,15 @@ export const createAction = <TPayload>(type: string): CreateAction<TPayload> => 
     };
 
     create.type = type;
-    return <CreateAction<TPayload>>create;
+    return create;
 }
 
 /**
  * Promise Action Interface and Creator
  */
 export interface CreatePromiseAction<TParams = undefined> {
-    (params?: TParams): Redux.Action;
+    (): Redux.Action;
+    (payload: TParams): Redux.Action;
     matchAction(action: Redux.Action): action is PromiseAction<TParams>;
     matchOnStart(action: Redux.Action): action is PromiseAction<TParams>;
     matchOnEnd(action: Redux.Action): action is PromiseAction<TParams>;
@@ -87,7 +89,7 @@ export interface PromiseAction<TParams = undefined> extends IPromiseAction<TPara
 
 export const createPromiseAction = <TParms, TResult>(
     type: string,
-    promise: (parms: TParms | undefined) => Promise<TResult>,
+    promise: (parms?: TParms) => Promise<TResult>,
     resultAction: (res: TResult, parms?: TParms) => any,
     options?: CreatePromiseActionOptions): CreatePromiseAction<TParms> => {
 
@@ -119,7 +121,7 @@ export const createPromiseAction = <TParms, TResult>(
         (<PromiseAction>action).promiseActionEvent === 'OnError';
 
     create.type = type;
-    return <CreatePromiseAction<TParms>>create;
+    return create;
 }
 
 export function createPromiseThunkAction<TParms, TResult>(
