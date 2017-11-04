@@ -25,6 +25,7 @@ import * as  expect from 'expect';
 import * as lib from '../src';
 
 describe('Action Creators', () => {
+
     it('createAtion', () => {
         const simpleAction = lib.createAction<string>('TEST_ACTION');
 
@@ -41,6 +42,7 @@ describe('Action Creators', () => {
         const act2 = { type: 'TEST_ANOTHER_ACTION', payload: 'test payload' };
 
         const simpleAction = lib.createAction<string>('TEST_ACTION');
+        simpleAction()
 
         expect(simpleAction.matchAction(act1)).toEqual(true);
         expect(simpleAction.matchAction(act2)).toEqual(false);
@@ -60,6 +62,14 @@ describe('Action Creators', () => {
 
         expect(promiseAction.type).toEqual('TEST_PROMISE_ACTION');
     })
+
+    it('createAction with no params', () => {
+        const actionCreator = lib.createAction('TEST_ACTION');
+        const action = actionCreator();
+        expect(action.type).toBe('TEST_ACTION');
+        // expect(action.payload).toNotBeInType()
+        // no action.payload in type of action--can't runtime test that!
+    });
 });
 
 
