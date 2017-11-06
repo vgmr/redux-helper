@@ -72,7 +72,7 @@ const checkedPromiseMiddleware = (options?: CheckedPromiseMiddlewareOptions) => 
                 promiseActionType: action.type,
                 promiseActionEvent: 'OnStart',
                 promiseActionMessage: message,
-                promiseActionParams: promiseParms,
+                promiseActionParams: promiseParms
             });
             dispatch(actStart);
         }

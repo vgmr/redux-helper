@@ -25,15 +25,12 @@ import * as  expect from 'expect';
 import * as lib from '../src';
 
 describe('Action Creators', () => {
+
     it('createAtion', () => {
         const simpleAction = lib.createAction<string>('TEST_ACTION');
-
         const actRes = simpleAction('test payload');
-
         expect(actRes.type).toEqual('TEST_ACTION');
-
         expect(actRes.payload).toEqual('test payload');
-
     })
 
     it('createAtion.matchAction', () => {
