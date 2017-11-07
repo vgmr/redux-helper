@@ -23,10 +23,12 @@
 import * as mocha from 'mocha';
 import * as  expect from 'expect';
 import * as lib from '../src';
+import { Action } from 'redux';
+import { PromiseAction } from '../src/actionCreators';
 
 describe('Action Creators', () => {
 
-    it('createAtion', () => {
+    it('createAction', () => {
         const simpleAction = lib.createAction<string>('TEST_ACTION');
         const actRes = simpleAction('test payload');
         expect(actRes.type).toEqual('TEST_ACTION');
@@ -58,6 +60,3 @@ describe('Action Creators', () => {
         expect(promiseAction.type).toEqual('TEST_PROMISE_ACTION');
     })
 });
-
-
-

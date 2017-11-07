@@ -36,7 +36,7 @@ export interface CreateAction<TPayload> {
     (payload: TPayload): Action<TPayload>;
     (): Redux.Action;
     matchAction(action: Redux.Action): action is Action<TPayload>;
-    matchAsLinkedPromiseAction(action: Redux.Action): action is PromiseAction;
+    matchAsLinkedPromiseAction(action: Redux.Action): action is PromiseActionInstance<any>;
     type: string;
 }
 
@@ -47,7 +47,7 @@ export const createAction = <TPayload>(type: string): CreateAction<TPayload> => 
         return action.type === type
     };
 
-    create.matchAsLinkedPromiseAction = <TPayLoad>(action: Redux.Action): action is PromiseAction => {
+    create.matchAsLinkedPromiseAction = <TPayLoad>(action: Redux.Action): action is PromiseActionInstance<any> => {
         return action.type === type && (<PromiseAction>action).promiseActionType != null;
     };
 
@@ -73,7 +73,6 @@ export interface PromiseActionInstance<TParams> extends PromiseAction {
  */
 export interface CreatePromiseAction<TParams> {
     (params?: TParams): Redux.Action;
-    matchAction(action: Redux.Action): action is PromiseActionInstance<TParams>;
     matchOnStart(action: Redux.Action): action is PromiseActionInstance<TParams>;
     matchOnEnd(action: Redux.Action): action is PromiseActionInstance<TParams>;
     matchOnError(action: Redux.Action): action is PromiseActionInstance<TParams>;
@@ -107,18 +106,15 @@ export const createPromiseAction = <TParams, TResult>(
         }
     )
 
-    create.matchAction = <TPayLoad>(action: Redux.Action) =>
-        (<PromiseAction>action).promiseActionType === type;
-
-    create.matchOnStart = <TPayLoad>(action: Redux.Action) =>
+    create.matchOnStart = <TPayLoad>(action: Redux.Action): action is PromiseActionInstance<TParams> =>
         (<PromiseAction>action).promiseActionType === type &&
         (<PromiseAction>action).promiseActionEvent === 'OnStart';
 
-    create.matchOnEnd = <TPayLoad>(action: Redux.Action) =>
+    create.matchOnEnd = <TPayLoad>(action: Redux.Action): action is PromiseActionInstance<TParams> =>
         (<PromiseAction>action).promiseActionType === type &&
         (<PromiseAction>action).promiseActionEvent === 'OnEnd';
 
-    create.matchOnError = <TPayLoad>(action: Redux.Action) =>
+    create.matchOnError = <TPayLoad>(action: Redux.Action): action is PromiseActionInstance<TParams> =>
         (<PromiseAction>action).promiseActionType === type &&
         (<PromiseAction>action).promiseActionEvent === 'OnError';
 
