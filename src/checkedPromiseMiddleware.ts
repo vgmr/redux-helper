@@ -21,7 +21,7 @@
 // SOFTWARE.
 
 import { Action, Dispatch, MiddlewareAPI } from 'redux';
-import { PromiseAction, IPromiseAction } from './actionCreators'
+import { PromiseAction, IPromiseAction, PromiseActionInstance } from './actionCreators'
 
 export interface CheckedPromiseMiddlewareOptions {
     onStart?: (message?: string) => Action;
@@ -48,7 +48,7 @@ const checkedPromiseMiddleware = (options?: CheckedPromiseMiddlewareOptions) => 
         checkExecution = false,
         enableProgress = true,
         message = 'loading',
-        promiseParms,
+        promiseParams,
         promise = undefined as Promise<any> | undefined,
         resultAction
     } = action.payload;
@@ -68,11 +68,11 @@ const checkedPromiseMiddleware = (options?: CheckedPromiseMiddlewareOptions) => 
         const actStart = opts.onStart(message);
 
         if (_validAction(actStart)) {
-            Object.assign(actStart, <IPromiseAction>{
+            Object.assign(actStart, <PromiseActionInstance<any>>{
                 promiseActionType: action.type,
                 promiseActionEvent: 'OnStart',
                 promiseActionMessage: message,
-                promiseActionParams: promiseParms
+                promiseActionParams: promiseParams
             });
             dispatch(actStart);
         }
@@ -83,27 +83,27 @@ const checkedPromiseMiddleware = (options?: CheckedPromiseMiddlewareOptions) => 
             if (enableProgress && _validFunction(opts.onEnd)) {
                 const actEnd = opts.onEnd();
                 if (_validAction(actEnd)) {
-                    Object.assign(actEnd, <IPromiseAction>{
+                    Object.assign(actEnd, <PromiseActionInstance<any>>{
                         promiseActionType: action.type,
                         promiseActionEvent: 'OnEnd',
-                        promiseActionParams: promiseParms,
+                        promiseActionParams: promiseParams
                     });
                     dispatch(actEnd);
                 }
             }
 
-            const actResult = resultAction(response, promiseParms);
+            const actResult = resultAction(response, promiseParams);
             dispatch(actResult);
         },
         (error: any) => {
             if (_validFunction(opts.onError)) {
                 const actError = opts.onError(error);
                 if (_validAction(actError)) {
-                    Object.assign(actError, <IPromiseAction>{
+                    Object.assign(actError, <PromiseActionInstance<any>>{
                         promiseActionType: action.type,
                         promiseActionEvent: 'OnError',
                         promiseActionError: error,
-                        promiseActionParams: promiseParms,
+                        promiseActionParams: promiseParams
                     });
                     dispatch(actError);
                 }
