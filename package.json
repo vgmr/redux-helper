@@ -14,15 +14,15 @@
     "@types/expect": "^1.20.2",
     "@types/mocha": "^2.2.44",
     "@types/node": "^8.0.50",
-    "babel-cli": "^6.11.4",
-    "babel-plugin-transform-es2015-parameters": "^6.11.4",
-    "babel-plugin-transform-object-assign": "^6.8.0",
-    "babel-preset-es2015": "^6.13.2",
+    "babel-cli": "^6.26.0",
+    "babel-plugin-transform-es2015-parameters": "^6.24.1",
+    "babel-plugin-transform-object-assign": "^6.22.0",
+    "babel-preset-es2015": "^6.24.1",
     "expect": "^21.2.1",
     "jsdom": "^11.3.0",
     "mocha": "^4.0.1",
-    "rimraf": "^2.5.4",
-    "ts-node": "^3.0.2"
+    "rimraf": "^2.6.2",
+    "ts-node": "^3.3.0"
   },
   "dependencies": {
     "redux": "^3.7.2"
