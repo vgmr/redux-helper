@@ -2,54 +2,95 @@ import * as mocha from "mocha";
 import * as expect from "expect";
 import * as lib from "../src";
 import { createStore, applyMiddleware, Reducer, Store, Action } from "redux";
+import { CheckedPromiseMiddlewareOptions } from "../src";
 
 const result = lib.createAction<string>('RESULT');
-const promise = lib.createPromiseAction('PROMISE_ACTION', (val: string) => Promise.resolve<string>(`${val} for test`), result);
+const promiseAction = lib.createPromiseAction('PROMISE_ACTION', (val: string) => Promise.resolve(`${val} for test`), result);
 const onStart = lib.createAction<string>('ON_START');
+const onEnd = lib.createAction<string>('ON_END');
+const STARTING_MESSAGE = 'Start';
+const ENDING_MESSAGE = 'End';
+
+const MIDLWOPTS: CheckedPromiseMiddlewareOptions = {
+  onEnd: (act) => onEnd(`${ENDING_MESSAGE}_${act!.type}`),
+  onStart: (msg, act) => onStart(`${STARTING_MESSAGE}_${act!.type}`)
+}
 
 type ActModel = {
   type?: string;
   actionType?: string,
   actionParams?: any,
   actionEvent?: 'OnStart' | 'OnEnd' | 'OnError';
+  payload?: any;
 }
 
 interface IAppState {
-  linked?: ActModel,
-  promise?: ActModel,
-  result?: string
+  linkedStart?: ActModel;
+  linkedEnd?: ActModel;
+  promiseStart?: ActModel;
+  promiseEnd?: ActModel;
+  result?: string;
 }
 
 const initialState: IAppState = {};
 
-const reducer: Reducer<IAppState> = (state: IAppState, action: Action) => {
-  let retState = initialState;
+const reducer: Reducer<IAppState> = (state: IAppState = initialState, action: Action) => {
+  let retState = undefined;
 
-  if (onStart.matchAsLinkedPromiseAction(action)) {
+  if (onStart.matchAsLinkedPromiseAction(action, promiseAction)) {
     retState = {
       ...state,
-      ...retState,
-      linked: {
+      ...retState || {},
+      linkedStart: {
         type: action.type,
-        actionType: action.promiseActionType,
+        actionType: promiseAction.type,
+        actionParams: action.promiseActionParams,
+        payload: action.payload
+      },
+      result: action.payload
+    }
+  }
+
+  if (onEnd.matchAsLinkedPromiseAction(action, promiseAction)) {
+    retState = {
+      ...state,
+      ...retState || {},
+      linkedEnd: {
+        type: action.type,
+        actionType: promiseAction.type,
+        actionParams: action.promiseActionParams,
+        payload: action.payload
+      },
+      result: action.payload
+    }
+  }
+
+  if (promiseAction.matchOnStart(action)) {
+    retState = {
+      ...state,
+      ...retState || {},
+      promiseStart: {
+        type: action.type,
+        actionType: promiseAction.type,
         actionParams: action.promiseActionParams,
         actionEvent: action.promiseActionEvent
       }
     }
   }
 
-  if (promise.matchOnStart(action)) {
+  if (promiseAction.matchOnEnd(action)) {
     retState = {
       ...state,
-      ...retState,
-      promise: {
+      ...retState || {},
+      promiseEnd: {
         type: action.type,
-        actionType: action.promiseActionType,
+        actionType: promiseAction.type,
         actionParams: action.promiseActionParams,
         actionEvent: action.promiseActionEvent
       }
     }
   }
+
   if (result.matchAction(action)) {
     retState = {
       ...state,
@@ -57,16 +98,18 @@ const reducer: Reducer<IAppState> = (state: IAppState, action: Action) => {
     }
   }
 
-  return retState;
+  return retState || state;
 };
 
 describe("checked promise", () => {
+  const TEST_STR = 'A test';
+
   let store: Store<IAppState>;
 
   const initStore = () => {
     store = createStore<IAppState>(
       reducer,
-      applyMiddleware(lib.checkedPromiseMiddleware({ onStart }))
+      applyMiddleware(lib.checkedPromiseMiddleware(MIDLWOPTS))
     );
   };
 
@@ -74,18 +117,40 @@ describe("checked promise", () => {
 
     before(() => {
       initStore();
-      store.dispatch(promise('A Test'));
+      store.dispatch(promiseAction(TEST_STR));
     });
 
     it("should match promise", () => {
-      console.log('state', store.getState());
-      const { linked, promise } = store.getState();
+      const { linkedStart, linkedEnd, promiseStart, promiseEnd, result } = store.getState();
 
-      expect(linked).toExist();
-      expect(promise).toExist();
+      expect(linkedStart).toExist();
+      expect(linkedEnd).toExist();
+      expect(promiseStart).toExist();
+      expect(promiseEnd).toExist();
 
-      expect(linked).toEqual(promise);
-      expect(linked && linked.actionParams).toEqual('A Test');
+      if (!linkedStart || !linkedEnd || !promiseStart || !promiseEnd) throw Error("Linked or Promise undefined (should not never happer!)");
+
+      expect(linkedStart.type).toEqual(onStart.type);
+      expect(linkedStart.payload).toExist().toEqual(`${STARTING_MESSAGE}_${promiseAction.type}`);
+      expect(linkedStart.actionType).toExist().toEqual(promiseAction.type);
+      expect(linkedStart.actionParams).toEqual(TEST_STR);
+
+      expect(linkedEnd.type).toEqual(onEnd.type);
+      expect(linkedEnd.payload).toExist().toEqual(`${ENDING_MESSAGE}_${promiseAction.type}`);
+      expect(linkedEnd.actionType).toExist().toEqual(promiseAction.type);
+      expect(linkedEnd.actionParams).toEqual(TEST_STR);
+
+      expect(promiseStart.type).toEqual(onStart.type);
+      expect(promiseStart.actionType).toEqual(promiseAction.type);
+      expect(promiseStart.actionParams).toEqual(TEST_STR);
+      expect(promiseStart.actionEvent).toEqual('OnStart');
+
+      expect(promiseEnd.type).toEqual(onEnd.type);
+      expect(promiseEnd.actionType).toEqual(promiseAction.type);
+      expect(promiseEnd.actionParams).toEqual(TEST_STR);
+      expect(promiseEnd.actionEvent).toEqual('OnEnd');
+
+      expect(result).toEqual(`${TEST_STR} for test`);
     });
 
   });

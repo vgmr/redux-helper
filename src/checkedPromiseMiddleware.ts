@@ -21,13 +21,13 @@
 // SOFTWARE.
 
 import { Action, Dispatch, MiddlewareAPI } from 'redux';
-import { PromiseAction, IPromiseAction, PromiseActionInstance } from './actionCreators'
+import { PromiseAction, PromiseActionInstance } from './actionTypes'
 
 export interface CheckedPromiseMiddlewareOptions {
-    onStart?: (message?: string) => Action;
-    onEnd?: () => Action;
-    onError?: (error?: any) => Action;
-    shouldExecute?: (state: any) => boolean;
+    onStart?: (message?: string, promiseAction?: PromiseAction) => Action;
+    onEnd?: (promiseAction?: PromiseAction) => Action;
+    onError?: (error?: any, promiseAction?: PromiseAction) => Action;
+    shouldExecute?: (state: any, promiseAction?: PromiseAction) => boolean;
 }
 
 const _validFunction = (obj: any): obj is Function => {
@@ -59,13 +59,13 @@ const checkedPromiseMiddleware = (options?: CheckedPromiseMiddlewareOptions) => 
 
     const { dispatch, getState } = midlapi;
 
-    if (checkExecution && _validFunction(opts.shouldExecute) && !opts.shouldExecute(getState())) {
+    if (checkExecution && _validFunction(opts.shouldExecute) && !opts.shouldExecute(getState(), action)) {
         console.log('discarding action ' + action.type);
         return;
     }
 
     if (enableProgress && _validFunction(opts.onStart)) {
-        const actStart = opts.onStart(message);
+        const actStart = opts.onStart(message, action);
 
         if (_validAction(actStart)) {
             Object.assign(actStart, <PromiseActionInstance<any>>{
@@ -81,7 +81,7 @@ const checkedPromiseMiddleware = (options?: CheckedPromiseMiddlewareOptions) => 
     return promise.then(
         (response: any) => {
             if (enableProgress && _validFunction(opts.onEnd)) {
-                const actEnd = opts.onEnd();
+                const actEnd = opts.onEnd(action);
                 if (_validAction(actEnd)) {
                     Object.assign(actEnd, <PromiseActionInstance<any>>{
                         promiseActionType: action.type,
@@ -97,7 +97,7 @@ const checkedPromiseMiddleware = (options?: CheckedPromiseMiddlewareOptions) => 
         },
         (error: any) => {
             if (_validFunction(opts.onError)) {
-                const actError = opts.onError(error);
+                const actError = opts.onError(error, action);
                 if (_validAction(actError)) {
                     Object.assign(actError, <PromiseActionInstance<any>>{
                         promiseActionType: action.type,

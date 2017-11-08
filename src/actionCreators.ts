@@ -21,24 +21,7 @@
 // SOFTWARE.
 
 import * as Redux from 'redux';
-
-/**
- * Action Interface
- */
-export interface Action<TPayload> extends Redux.Action {
-    payload: TPayload
-}
-
-/**
- * Plain Action creator
- */
-export interface CreateAction<TPayload> {
-    (payload: TPayload): Action<TPayload>;
-    (): Redux.Action;
-    matchAction(action: Redux.Action): action is Action<TPayload>;
-    matchAsLinkedPromiseAction(action: Redux.Action): action is PromiseActionInstance<any>;
-    type: string;
-}
+import { CreateAction, Action, CreatePromiseAction, CreatePromiseActionOptions, PromiseAction, LinkedPromiseAction, PromiseActionInstance } from './index';
 
 export const createAction = <TPayload>(type: string): CreateAction<TPayload> => {
     let create: any = <TPayload>(payload?: TPayload) => ({ type: type, payload: payload });
@@ -47,46 +30,14 @@ export const createAction = <TPayload>(type: string): CreateAction<TPayload> => 
         return action.type === type
     };
 
-    create.matchAsLinkedPromiseAction = <TPayLoad>(action: Redux.Action): action is PromiseActionInstance<any> => {
-        return action.type === type && (<PromiseAction>action).promiseActionType != null;
+    create.matchAsLinkedPromiseAction = <TParams>(action: Redux.Action, promiseAction: CreatePromiseAction<TParams>): action is LinkedPromiseAction<TPayload, TParams> => {
+        return action.type === type && (<PromiseAction>action).promiseActionType === promiseAction.type;
     };
 
     create.type = type;
     return <CreateAction<TPayload>>create;
 }
 
-export interface IPromiseAction {
-    promiseActionType: string;
-    promiseActionEvent: 'OnStart' | 'OnEnd' | 'OnError';
-    promiseActionMessage?: string,
-    promiseActionError?: any;
-}
-
-export interface PromiseAction extends IPromiseAction, Redux.Action { }
-
-export interface PromiseActionInstance<TParams> extends PromiseAction {
-    promiseActionParams: TParams;
-}
-
-/**
- * Promise Action Interface and Creator
- */
-export interface CreatePromiseAction<TParams> {
-    (params?: TParams): Redux.Action;
-    matchOnStart(action: Redux.Action): action is PromiseActionInstance<TParams>;
-    matchOnEnd(action: Redux.Action): action is PromiseActionInstance<TParams>;
-    matchOnError(action: Redux.Action): action is PromiseActionInstance<TParams>;
-    type: string;
-}
-
-/**
- * Promise Action Options
- */
-export interface CreatePromiseActionOptions {
-    checkExecution?: boolean,
-    enableProgress?: boolean,
-    message?: string
-}
 
 export const createPromiseAction = <TParams, TResult>(
     type: string,

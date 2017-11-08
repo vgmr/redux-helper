@@ -22,10 +22,16 @@
 
 import {
     Action,
-    createAction,
     CreateAction,
     CreatePromiseAction,
     CreatePromiseActionOptions,
+    LinkedPromiseAction,
+    PromiseAction,
+    PromiseActionInstance
+} from './actionTypes';
+
+import {
+    createAction,
     createPromiseAction,
     createPromiseThunkAction,
     createPromiseWithThunkAction
@@ -37,6 +43,9 @@ export default checkedPromiseMiddleware;
 
 export {
     Action,
+    PromiseAction,
+    PromiseActionInstance,
+    LinkedPromiseAction,
     checkedPromiseMiddleware,
     CheckedPromiseMiddlewareOptions,
     createAction,
