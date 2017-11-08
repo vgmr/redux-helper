@@ -47,7 +47,7 @@ namespace thunkInit {
     );
 
     export const action2 = createPromiseWithThunkAction(
-        'PR1',
+        'PR2',
         (s: string) => Promise.resolve(s),
         resultAction,
         (d, g, r, p) => {
