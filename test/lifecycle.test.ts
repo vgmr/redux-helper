@@ -107,6 +107,7 @@ describe("lifecycle (promise actions)", () => {
       });
     });
 
+
     describe("error in promise", () => {
       before(() => {
         promiseActionParams = "FORCEERROR";

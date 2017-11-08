@@ -19,38 +19,30 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+import * as mocha from "mocha";
+import * as expect from "expect";
+import { thunkInit } from './thunk.init';
+import { Store } from "redux";
 
-import {
-    Action,
-    CreateAction,
-    CreatePromiseAction,
-    CreatePromiseActionOptions,
-    LinkedPromiseAction,
-    PromiseAction,
-    PromiseActionInstance
-} from './actionTypes';
+describe("thunked actions", () => {
 
-import {
-    createAction,
-    createPromiseAction,
-    createPromiseWithThunkAction
-} from './actionCreators';
+    let store: Store<thunkInit.IAppState>;
 
-import checkedPromiseMiddleware, { CheckedPromiseMiddlewareOptions } from './checkedPromiseMiddleware';
+    describe("thunked actions result", () => {
 
-export default checkedPromiseMiddleware;
+        before(() => {
+            store = thunkInit.getStore();
+            store.dispatch(thunkInit.action1('test'));
+            store.dispatch(thunkInit.action2('test 2'));
+        });
 
-export {
-    Action,
-    PromiseAction,
-    PromiseActionInstance,
-    LinkedPromiseAction,
-    checkedPromiseMiddleware,
-    CheckedPromiseMiddlewareOptions,
-    createAction,
-    CreateAction,
-    CreatePromiseAction,
-    CreatePromiseActionOptions,
-    createPromiseAction,
-    createPromiseWithThunkAction
-}
+        it('should match result', () => {
+            const state = store.getState();
+            expect(state.result).toEqual('test 2')
+            expect(state.resultThunk).toEqual('test')
+            expect(state.resultThunk2).toEqual('test 2')
+        })
+
+    });
+
+});

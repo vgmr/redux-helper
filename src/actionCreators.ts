@@ -73,22 +73,31 @@ export const createPromiseAction = <TParams, TResult>(
     return <CreatePromiseAction<TParams>>create;
 }
 
-export function createPromiseThunkAction<TParams, TResult>(
+export function createPromiseWithThunkAction<TParams, TResult>(
     type: string,
     promise: (arg: TParams) => Promise<TResult>,
-    afterResultThunk: (dispatch: Redux.Dispatch<any>, getState: () => any, res: TResult, params?: TParams) => void) {
-    return createPromiseWithThunkAction(type, promise, undefined, afterResultThunk);
-}
+    thunk: (dispatch: Redux.Dispatch<any>, getState: () => any, res: TResult, params?: TParams) => void
+): CreatePromiseAction<TParams>;
 
 export function createPromiseWithThunkAction<TParams, TResult>(
     type: string,
     promise: (arg: TParams) => Promise<TResult>,
-    resultAction: ((res: TResult, params?: TParams | undefined) => any) | undefined,
-    afterResultThunk: (dispatch: Redux.Dispatch<any>, getState: () => any, res: TResult, params?: TParams) => void) {
+    resultActionBuilder: ((res: TResult, params?: TParams) => any),
+    afterResultThunk: (dispatch: Redux.Dispatch<any>, getState: () => any, res: TResult, params?: TParams) => void
+): CreatePromiseAction<TParams>;
+
+export function createPromiseWithThunkAction<TParams, TResult>(
+    type: string,
+    promise: (arg: TParams) => Promise<TResult>,
+    resultActionBuilderOrThunk: any | undefined,
+    afterResultThunk?: any) {
+
+    const resultActionBuilder: (res: TResult, params?: TParams) => any = afterResultThunk ? resultActionBuilderOrThunk : undefined;
+    const thunk: (dispatch: Redux.Dispatch<any>, getState: () => any, res: TResult, params?: TParams) => void = afterResultThunk ? afterResultThunk : resultActionBuilderOrThunk;
 
     const thunkAction = (res: TResult, params?: TParams) => (dispatch: Redux.Dispatch<any>, getState: () => any) => {
-        if (resultAction) dispatch(resultAction(res, params));
-        if (afterResultThunk) afterResultThunk(dispatch, getState, res, params);
+        if (resultActionBuilder !== undefined) dispatch(resultActionBuilder(res, params));
+        if (thunk !== undefined) thunk(dispatch, getState, res, params);
     }
 
     return createPromiseAction(type, promise, thunkAction);
