@@ -87,7 +87,7 @@ export function createPromiseWithThunkAction<TParams, TResult>(
     afterResultThunk: (dispatch: Redux.Dispatch<any>, getState: () => any, res: TResult, params?: TParams) => void) {
 
     const thunkAction = (res: TResult, params?: TParams) => (dispatch: Redux.Dispatch<any>, getState: () => any) => {
-        if (resultAction) dispatch(resultAction(res));
+        if (resultAction) dispatch(resultAction(res, params));
         if (afterResultThunk) afterResultThunk(dispatch, getState, res, params);
     }
 
