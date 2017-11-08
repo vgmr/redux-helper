@@ -21,10 +21,8 @@
 // SOFTWARE.
 
 import * as mocha from 'mocha';
-import * as  expect from 'expect';
-import * as lib from '../src';
-import { Action } from 'redux';
-import { PromiseAction } from '../src/actionTypes';
+import * as expect from 'expect';
+import * as lib from "../src";
 
 describe('Action Creators', () => {
 

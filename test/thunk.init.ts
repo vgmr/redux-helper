@@ -20,11 +20,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 import * as mocha from "mocha";
-import * as expect from "expect";
 import * as lib from "../src";
-import { createStore, applyMiddleware, Reducer, Store } from "redux";
-import { createPromiseWithThunkAction, createAction } from "../src";
-import { expectExist } from "./common";
+import { createPromiseWithThunkAction } from "../src";
+import { Reducer, Action, createStore, applyMiddleware } from "redux";
 import thunk from 'redux-thunk';
 
 namespace thunkInit {
@@ -44,10 +42,6 @@ namespace thunkInit {
         'PR',
         (s: string) => Promise.resolve(s),
         (d, g, r, p) => {
-            expectExist(p).toEqual('test');
-            expectExist(d);
-            expectExist(g);
-            expectExist(r);
             d(resultThunkAction(p));
         }
     );
@@ -57,10 +51,6 @@ namespace thunkInit {
         (s: string) => Promise.resolve(s),
         resultAction,
         (d, g, r, p) => {
-            expectExist(p).toEqual('test 2');
-            expectExist(d);
-            expectExist(g);
-            expectExist(r);
             d(resultThunkAction2(p));
         }
     );

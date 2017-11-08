@@ -20,11 +20,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 import * as mocha from "mocha";
-import * as expect from "expect";
 import * as lib from "../src";
-import { createStore, applyMiddleware, Reducer, Store, Action } from "redux";
-import { createPromiseWithThunkAction, createAction, CheckedPromiseMiddlewareOptions } from "../src";
-import { expectExist } from "./common";
+import { CheckedPromiseMiddlewareOptions } from "../src";
+import { Reducer, Action, createStore, applyMiddleware } from "redux";
 
 namespace linkedInit {
     export const STARTING_MESSAGE = 'Start';

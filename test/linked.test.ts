@@ -21,11 +21,9 @@
 // SOFTWARE.
 import * as mocha from "mocha";
 import * as expect from "expect";
-import * as lib from "../src";
-import { createStore, applyMiddleware, Reducer, Store, Action } from "redux";
-import { CheckedPromiseMiddlewareOptions } from "../src";
 import { expectExist } from "./common";
 import { linkedInit } from './linked.init';
+import { Store } from "redux";
 
 describe("checked promise", () => {
 
