@@ -3,18 +3,21 @@ import * as expect from "expect";
 import * as lib from "../src";
 import { createStore, applyMiddleware, Reducer, Store, Action } from "redux";
 import { CheckedPromiseMiddlewareOptions } from "../src";
+import { expectExist } from "./common";
 
-const result = lib.createAction<string>('RESULT');
-const promiseAction = lib.createPromiseAction('PROMISE_ACTION', (val: string) => Promise.resolve(`${val} for test`), result);
-const onStart = lib.createAction<string>('ON_START');
-const onEnd = lib.createAction<string>('ON_END');
 const STARTING_MESSAGE = 'Start';
 const ENDING_MESSAGE = 'End';
+
+const onStart = lib.createAction<string>('ON_START');
+const onEnd = lib.createAction<string>('ON_END');
+const result = lib.createAction<string>('RESULT');
+const promiseAction = lib.createPromiseAction('PROMISE_ACTION', (val: string) => Promise.resolve(`${val} for test`), result);
 
 const MIDLWOPTS: CheckedPromiseMiddlewareOptions = {
   onEnd: (act) => onEnd(`${ENDING_MESSAGE}_${act!.type}`),
   onStart: (msg, act) => onStart(`${STARTING_MESSAGE}_${act!.type}`)
 }
+
 
 type ActModel = {
   type?: string;
@@ -123,21 +126,21 @@ describe("checked promise", () => {
     it("should match promise", () => {
       const { linkedStart, linkedEnd, promiseStart, promiseEnd, result } = store.getState();
 
-      expect(linkedStart).toExist();
-      expect(linkedEnd).toExist();
-      expect(promiseStart).toExist();
-      expect(promiseEnd).toExist();
+      expectExist(linkedStart);
+      expectExist(linkedEnd);
+      expectExist(promiseStart);
+      expectExist(promiseEnd);
 
       if (!linkedStart || !linkedEnd || !promiseStart || !promiseEnd) throw Error("Linked or Promise undefined (should not never happer!)");
 
       expect(linkedStart.type).toEqual(onStart.type);
-      expect(linkedStart.payload).toExist().toEqual(`${STARTING_MESSAGE}_${promiseAction.type}`);
-      expect(linkedStart.actionType).toExist().toEqual(promiseAction.type);
+      expectExist(linkedStart.payload).toEqual(`${STARTING_MESSAGE}_${promiseAction.type}`);
+      expectExist(linkedStart.actionType).toEqual(promiseAction.type);
       expect(linkedStart.actionParams).toEqual(TEST_STR);
 
       expect(linkedEnd.type).toEqual(onEnd.type);
-      expect(linkedEnd.payload).toExist().toEqual(`${ENDING_MESSAGE}_${promiseAction.type}`);
-      expect(linkedEnd.actionType).toExist().toEqual(promiseAction.type);
+      expectExist(linkedEnd.payload).toEqual(`${ENDING_MESSAGE}_${promiseAction.type}`);
+      expectExist(linkedEnd.actionType).toEqual(promiseAction.type);
       expect(linkedEnd.actionParams).toEqual(TEST_STR);
 
       expect(promiseStart.type).toEqual(onStart.type);
