@@ -12,7 +12,7 @@
   "typings": "dist/index.d.ts",
   "devDependencies": {
     "@types/expect": "^1.20.2",
-    "@types/mocha": "^2.2.38",
+    "@types/mocha": "^2.2.44",
     "@types/node": "^8.0.50",
     "babel-cli": "^6.11.4",
     "babel-plugin-transform-es2015-parameters": "^6.11.4",
