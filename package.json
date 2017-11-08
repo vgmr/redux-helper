@@ -1,6 +1,6 @@
 {
   "name": "redux-helper",
-  "version": "0.0.65",
+  "version": "0.0.66",
   "license": "MIT",
   "description": "Redux reducer and action helper",
   "repository": "https://github.com/vgmr/redux-helper/",
