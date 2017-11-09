@@ -21,7 +21,6 @@
 // SOFTWARE.
 import * as mocha from "mocha";
 import * as lib from "../src";
-import { createPromiseWithThunkAction } from "../src";
 import { Reducer, Action, createStore, applyMiddleware } from "redux";
 import thunk from 'redux-thunk';
 
@@ -31,27 +30,35 @@ namespace thunkInit {
         result?: string;
         resultThunk?: string;
         resultThunk2?: string;
+        message?: string;
     }
 
     const initialState: IAppState = {};
     const resultAction = lib.createAction<string>("RESULT_ACTION");
     const resultThunkAction = lib.createAction<string>("RESULT_THUNK_ACTION");
     const resultThunkAction2 = lib.createAction<string>("RESULT_THUNK_ACTION2");
+    const onStartAction = lib.createAction<string>('ON_START');
 
-    export const action1 = createPromiseWithThunkAction(
+    export const ACTION_MESSAGE = "this is a message.";
+
+    export const action1 = lib.createPromiseWithThunkAction(
         'PR',
         (s: string) => Promise.resolve(s),
         (d, g, r, p) => {
             d(resultThunkAction(p));
+        }, {
+            message: ACTION_MESSAGE
         }
     );
 
-    export const action2 = createPromiseWithThunkAction(
+    export const action2 = lib.createPromiseWithThunkAction(
         'PR2',
         (s: string) => Promise.resolve(s),
         resultAction,
         (d, g, r, p) => {
             d(resultThunkAction2(p));
+        }, {
+            message: ACTION_MESSAGE
         }
     );
 
@@ -59,6 +66,9 @@ namespace thunkInit {
         state = initialState,
         action: lib.Action<any>
     ) => {
+        if (onStartAction.matchAction(action)) {
+            return { ...state, message: action.payload };
+        }
         if (resultAction.matchAction(action)) {
             return { ...state, result: action.payload };
         }
@@ -74,7 +84,7 @@ namespace thunkInit {
     export const getStore = () => {
         return createStore<IAppState>(
             reducer,
-            applyMiddleware(...[lib.checkedPromiseMiddleware(), thunk])
+            applyMiddleware(...[lib.checkedPromiseMiddleware({ onStart: onStartAction }), thunk])
         );
     };
 }

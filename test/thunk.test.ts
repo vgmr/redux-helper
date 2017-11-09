@@ -23,6 +23,7 @@ import * as mocha from "mocha";
 import * as expect from "expect";
 import { thunkInit } from './thunk.init';
 import { Store } from "redux";
+import { expectExist } from './common';
 
 describe("thunked actions", () => {
 
@@ -41,6 +42,7 @@ describe("thunked actions", () => {
             expect(state.result).toEqual('test 2')
             expect(state.resultThunk).toEqual('test')
             expect(state.resultThunk2).toEqual('test 2')
+            expectExist(state.message).toEqual(thunkInit.ACTION_MESSAGE);
         })
 
     });

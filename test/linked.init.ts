@@ -21,7 +21,7 @@
 // SOFTWARE.
 import * as mocha from "mocha";
 import * as lib from "../src";
-import { CheckedPromiseMiddlewareOptions } from "../src";
+import { CheckedPromiseMiddlewareOptions, PromiseActionInstance } from "../src";
 import { Reducer, Action, createStore, applyMiddleware } from "redux";
 
 namespace linkedInit {

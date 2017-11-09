@@ -32,7 +32,7 @@ export interface Action<TPayload> extends Redux.Action {
 /**
  * LinkedPromiseAction type ( linked action return interface )
  */
-export type LinkedPromiseAction<TPayload, TParams> = Action<TPayload> & { promiseActionParams: TParams; }
+export type LinkedPromiseAction<TPayload, TParams> = Action<TPayload> & PromiseActionInstance<TParams>;
 
 /**
  * Promise Action Interface
@@ -58,7 +58,7 @@ export interface PromiseActionInstance<TParams> extends PromiseAction {
 export interface CreateAction<TPayload> {
     (payload?: TPayload): Action<TPayload>;
     matchAction(action: Redux.Action): action is Action<TPayload>;
-    matchAsLinkedPromiseAction<TParams>(action: Redux.Action, promiseAction: CreatePromiseAction<TParams>): action is LinkedPromiseAction<TPayload, TParams>;
+    matchAsLinkedPromiseAction<TParams>(action: Redux.Action, promiseAction: CreatePromiseAction<TParams>): action is Action<TPayload> & PromiseActionInstance<TParams>;
     type: string;
 }
 
