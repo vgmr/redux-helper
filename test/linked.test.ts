@@ -21,7 +21,7 @@
 // SOFTWARE.
 import * as mocha from "mocha";
 import * as expect from "expect";
-import { expectExist } from "./common";
+import { expectExist, expectNotExist } from "./common";
 import { linkedInit } from './linked.init';
 import { Store } from "redux";
 
@@ -37,10 +37,12 @@ describe("checked promise", () => {
     before(() => {
       store = linkedInit.getStore();
       store.dispatch(linkedInit.promiseAction(TEST_STR));
+      store.dispatch(linkedInit.promiseAction2('2'));
+      store.dispatch(linkedInit.promiseActionError('err'));
     });
 
     it("should match promise", () => {
-      const { linkedStart, linkedEnd, promiseStart, promiseEnd, result } = store.getState();
+      const { stack, linkedStart, linkedEnd, promiseStart, promiseEnd, result } = store.getState();
 
       expectExist(linkedStart);
       expectExist(linkedEnd);
@@ -70,6 +72,19 @@ describe("checked promise", () => {
       expect(promiseEnd.actionEvent).toEqual('OnEnd');
 
       expect(result).toEqual(`${TEST_STR} for test`);
+
+      expect(stack[linkedInit.promiseAction.type].started).toBeTruthy();
+      expect(stack[linkedInit.promiseAction.type].ended).toBeTruthy();
+      expectNotExist(stack[linkedInit.promiseAction.type].error);
+      
+      expect(stack[linkedInit.promiseAction2.type].ended).toBeTruthy();
+      expect(stack[linkedInit.promiseAction2.type].ended).toBeTruthy();
+      expectNotExist(stack[linkedInit.promiseAction2.type].error);
+
+      expect(stack[linkedInit.promiseActionError.type].ended).toBeFalsy();
+      expect(stack[linkedInit.promiseActionError.type].started).toBeTruthy();
+      expectExist(stack[linkedInit.promiseActionError.type].error);
+      
     });
 
   });

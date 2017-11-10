@@ -31,8 +31,11 @@ export const createAction = <TPayload>(type: string): CreateAction<TPayload> => 
         return action.type === type
     };
 
-    create.matchAsLinkedPromiseAction = <TParams>(action: Redux.Action, promiseAction: CreatePromiseAction<TParams>): action is LinkedPromiseAction<TPayload, TParams> => {
-        return action.type === type && (<PromiseAction>action).promiseActionType === promiseAction.type;
+    create.matchAsLinkedPromiseAction = <TParams>(action: Redux.Action, promiseAction?: CreatePromiseAction<TParams>): action is LinkedPromiseAction<TPayload, TParams> => {
+        const typeMatch =  action.type === type;
+        if ( promiseAction )
+            return typeMatch && (<PromiseAction>action).promiseActionType === promiseAction.type;
+        return typeMatch && (<PromiseAction>action).promiseActionType !== undefined;
     };
 
     create.type = type;

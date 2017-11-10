@@ -24,10 +24,10 @@ import { Action, Dispatch, MiddlewareAPI } from 'redux';
 import { PromiseAction, PromiseActionInstance } from './actionTypes'
 
 export interface CheckedPromiseMiddlewareOptions {
-    onStart?: (message?: string, promiseAction?: PromiseAction) => Action;
-    onEnd?: (promiseAction?: PromiseAction) => Action;
-    onError?: (error?: any, promiseAction?: PromiseAction) => Action;
-    shouldExecute?: (state: any, promiseAction?: PromiseAction) => boolean;
+    onStart?: (message?: string, action?: Action) => Action;
+    onEnd?: (action?: Action) => Action;
+    onError?: (error?: any, action?: Action) => Action;
+    shouldExecute?: (state: any, action?: Action) => boolean;
 }
 
 const _validFunction = (obj: any): obj is Function => {

@@ -22,6 +22,12 @@
 import * as expect from "expect";
 import { Expectation } from "expect";
 
+export function expectNotExist<T>(value: any): Expectation<T> {
+    const exp = (<any>expect)(value);
+    exp.toBeUndefined();
+    return exp;
+}
+
 export function expectExist<T>(value: any): Expectation<T> {
     const exp = (<any>expect)(value);
     exp.not.toBeUndefined();
