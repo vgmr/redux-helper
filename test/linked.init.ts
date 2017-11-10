@@ -23,6 +23,8 @@ import * as mocha from "mocha";
 import * as lib from "../src";
 import { CheckedPromiseMiddlewareOptions, PromiseActionInstance } from "../src";
 import { Reducer, Action, createStore, applyMiddleware } from "redux";
+import { access } from "fs";
+import { createAction } from "../src/actionCreators";
 
 namespace linkedInit {
     export const STARTING_MESSAGE = 'Start';
@@ -30,12 +32,17 @@ namespace linkedInit {
 
     export const onStart = lib.createAction<string>('ON_START');
     export const onEnd = lib.createAction<string>('ON_END');
+    export const onError = lib.createAction<string>('ON_ERROR');
     export const result = lib.createAction<string>('RESULT');
     export const promiseAction = lib.createPromiseAction('LINKED_PROMISE_ACTION', (val: string) => Promise.resolve(`${val} for test`), result);
+    export const promiseAction2 = lib.createPromiseAction('LINKED_PROMISE_ACTION2', (val: string) => Promise.resolve(`${val} for test`), createAction('OTHER_RES'));
+    export const promiseActionError = lib.createPromiseAction('LINKED_PROMISE_ACTION3', (val: string) => Promise.reject('ERROR!'), createAction('NEVER DISPATCHED TO THE STORE'));
+    
 
     const MIDLWOPTS: CheckedPromiseMiddlewareOptions = {
         onEnd: (act) => onEnd(`${ENDING_MESSAGE}_${act!.type}`),
-        onStart: (msg, act) => onStart(`${STARTING_MESSAGE}_${act!.type}`)
+        onStart: (msg, act) => onStart(`${STARTING_MESSAGE}_${act!.type}`),
+        onError: (err, act) => onError(`Promise error type: ${act!.type}`)
     }
 
     type ActModel = {
@@ -52,12 +59,36 @@ namespace linkedInit {
         promiseStart?: ActModel;
         promiseEnd?: ActModel;
         result?: string;
+        stack:{ [key:string]: {started:boolean, ended?:boolean, error?: any} }
     }
 
-    const initialState: IAppState = {};
+    const initialState: IAppState = { stack:{} };
 
     const reducer: Reducer<IAppState> = (state: IAppState = initialState, action: Action) => {
         let retState = undefined;
+
+        if (onStart.matchAsLinkedPromiseAction(action)) {
+            let st = {...state.stack};
+            st[action.promiseActionType] = {...st[action.promiseActionType],  started: true};
+            retState = {
+              ...state,            
+              stack: st,
+            };
+          } else if (onEnd.matchAsLinkedPromiseAction(action) ) {
+                let st = {...state.stack};
+                st[action.promiseActionType] ={...st[action.promiseActionType], ended:true};
+                retState = {
+                  ...state,            
+                  stack: st,
+                };
+            } else if (onError.matchAsLinkedPromiseAction(action)){
+                let st = {...state.stack};
+                st[action.promiseActionType] ={...st[action.promiseActionType], error: `Message: ${ action.promiseActionError} - result: ${ action.payload}`};
+                retState = {
+                  ...state,            
+                  stack: st,
+                };
+            }
 
         if (onStart.matchAsLinkedPromiseAction(action, promiseAction)) {
             retState = {
