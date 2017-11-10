@@ -44,12 +44,14 @@ describe("checked promise", () => {
     it("should match promise", () => {
       const { stack, linkedStart, linkedEnd, promiseStart, promiseEnd, result } = store.getState();
 
+      expectExist(stack);
       expectExist(linkedStart);
       expectExist(linkedEnd);
       expectExist(promiseStart);
       expectExist(promiseEnd);
 
-      if (!linkedStart || !linkedEnd || !promiseStart || !promiseEnd) throw Error("Linked or Promise undefined (should not never happer!)");
+      if (!stack) throw Error("Stack is undefined (should never happen!)");
+      if (!stack || !linkedStart || !linkedEnd || !promiseStart || !promiseEnd) throw Error("Linked or Promise undefined (should never happen!)");
 
       expect(linkedStart.type).toEqual(onStart.type);
       expectExist(linkedStart.payload).toEqual(`${STARTING_MESSAGE}_${promiseAction.type}`);
@@ -76,7 +78,7 @@ describe("checked promise", () => {
       expect(stack[linkedInit.promiseAction.type].started).toBeTruthy();
       expect(stack[linkedInit.promiseAction.type].ended).toBeTruthy();
       expectNotExist(stack[linkedInit.promiseAction.type].error);
-      
+
       expect(stack[linkedInit.promiseAction2.type].ended).toBeTruthy();
       expect(stack[linkedInit.promiseAction2.type].ended).toBeTruthy();
       expectNotExist(stack[linkedInit.promiseAction2.type].error);
@@ -84,7 +86,7 @@ describe("checked promise", () => {
       expect(stack[linkedInit.promiseActionError.type].ended).toBeFalsy();
       expect(stack[linkedInit.promiseActionError.type].started).toBeTruthy();
       expectExist(stack[linkedInit.promiseActionError.type].error);
-      
+
     });
 
   });
