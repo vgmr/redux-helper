@@ -22,39 +22,65 @@
 
 import * as mocha from 'mocha';
 import * as expect from 'expect';
-import * as lib from "../src";
+import * as lib from '../src';
 
 describe('Action Creators', () => {
-
+  describe('with payload', () => {
     it('createAction', () => {
-        const simpleAction = lib.createAction<string>('TEST_ACTION');
-        const actRes = simpleAction('test payload');
-        expect(actRes.type).toEqual('TEST_ACTION');
-        expect(actRes.payload).toEqual('test payload');
-    })
+      const simpleAction = lib.createAction<string>('TEST_ACTION');
+      const actRes = simpleAction('test payload');
+      expect(actRes.type).toEqual('TEST_ACTION');
+      expect(actRes.payload).toEqual('test payload');
+    });
 
-    it('createAtion.matchAction', () => {
-        const act1 = { type: 'TEST_ACTION', payload: 'test payload' };
-        const act2 = { type: 'TEST_ANOTHER_ACTION', payload: 'test payload' };
+    it('createAction.matchAction', () => {
+      const act1 = { type: 'TEST_ACTION', payload: 'test payload' };
+      const act2 = { type: 'TEST_ANOTHER_ACTION', payload: 'test payload' };
 
-        const simpleAction = lib.createAction<string>('TEST_ACTION');
+      const simpleAction = lib.createAction<string>('TEST_ACTION');
 
-        expect(simpleAction.matchAction(act1)).toEqual(true);
-        expect(simpleAction.matchAction(act2)).toEqual(false);
-    })
+      expect(simpleAction.matchAction(act1)).toEqual(true);
+      expect(simpleAction.matchAction(act2)).toEqual(false);
+    });
 
     it('createAction.type', () => {
-        const simpleAction = lib.createAction<string>('TEST_ACTION');
-        expect(simpleAction.type).toEqual('TEST_ACTION');
-    })
+      const simpleAction = lib.createAction<string>('TEST_ACTION');
+      expect(simpleAction.type).toEqual('TEST_ACTION');
+    });
 
     it('createPromiseAction.type', () => {
-        const resultAction = lib.createAction<string>('RESULT_ACTION');
-        const promiseAction = lib.createPromiseAction<string, string>(
-            'TEST_PROMISE_ACTION',
-            (value) => Promise.resolve('value'),
-            resultAction);
+      const resultAction = lib.createAction<string>('RESULT_ACTION');
+      const promiseAction = lib.createPromiseAction<string, string>(
+        'TEST_PROMISE_ACTION',
+        value => Promise.resolve('value'),
+        resultAction,
+      );
 
-        expect(promiseAction.type).toEqual('TEST_PROMISE_ACTION');
-    })
+      expect(promiseAction.type).toEqual('TEST_PROMISE_ACTION');
+    });
+  });
+
+  describe('without payload', () => {
+    it('createAction', () => {
+      const simpleAction = lib.createAction('TEST_ACTION');
+      const actRes = simpleAction();
+      expect(actRes.type).toEqual('TEST_ACTION');
+    });
+
+    it('createAction.matchAction', () => {
+      const act1 = { type: 'TEST_ACTION' };
+      const act2 = { type: 'TEST_ANOTHER_ACTION' };
+
+      const simpleAction = lib.createAction('TEST_ACTION');
+
+      expect(simpleAction.matchAction(act1)).toEqual(true);
+      expect(simpleAction.matchAction(act2)).toEqual(false);
+    });
+
+    it('createAction.type', () => {
+      const simpleAction = lib.createAction('TEST_ACTION');
+      expect(simpleAction.type).toEqual('TEST_ACTION');
+    });
+
+  });
 });

@@ -24,8 +24,8 @@ import * as Redux from 'redux';
 import { CreateAction, Action, CreatePromiseAction, CreatePromiseActionOptions, PromiseAction, LinkedPromiseAction, PromiseActionInstance } from './index';
 
 // #region Action
-export const createAction = <TPayload>(type: string): CreateAction<TPayload> => {
-    let create: any = <TPayload>(payload?: TPayload) => ({ type: type, payload: payload });
+export const createAction = <TPayload = undefined>(type: string): CreateAction<TPayload> => {
+    let create: any = <TPayload>(payload?: TPayload) => payload && { type, payload } || { type };
 
     create.matchAction = <TPayLoad>(action: Redux.Action): action is Action<TPayload> => {
         return action.type === type
