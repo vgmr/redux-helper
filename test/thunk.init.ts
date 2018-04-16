@@ -45,7 +45,7 @@ namespace thunkInit {
         'PR',
         (s: string) => Promise.resolve(s),
         (d, g, r, p) => {
-            d(resultThunkAction(p));
+            p && d(resultThunkAction(p));
         }, {
             message: ACTION_MESSAGE
         }
@@ -56,7 +56,7 @@ namespace thunkInit {
         (s: string) => Promise.resolve(s),
         resultAction,
         (d, g, r, p) => {
-            d(resultThunkAction2(p));
+            p && d(resultThunkAction2(p));
         }, {
             message: ACTION_MESSAGE
         }
