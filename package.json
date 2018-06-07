@@ -21,12 +21,12 @@
     "expect": "^21.2.1",
     "jsdom": "^11.3.0",
     "mocha": "^4.0.1",
-    "redux-thunk": "^2.2.0",
     "rimraf": "^2.6.2",
     "ts-node": "^3.3.0"
   },
   "dependencies": {
-    "redux": "^3.7.2"
+    "redux": "^4.0.0",
+    "redux-thunk": "^2.3.0"
   },
   "scripts": {
     "release": "npm run build && npm version patch && npm publish",
