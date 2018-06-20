@@ -82,7 +82,7 @@ namespace thunkInit {
     };
 
     export const getStore = () => {
-        return createStore<IAppState>(
+        return createStore<IAppState, any, any, any>(
             reducer,
             applyMiddleware(...[lib.checkedPromiseMiddleware({ onStart: onStartAction }), thunk])
         );

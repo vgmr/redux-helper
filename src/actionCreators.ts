@@ -31,9 +31,9 @@ export const createAction = <TPayload>(type: string): CreateAction<TPayload> => 
         return action.type === type
     };
 
-    create.matchAsLinkedPromiseAction = <TParams>(action: Redux.Action, promiseAction?: CreatePromiseAction<TParams>): action is LinkedPromiseAction<TPayload, TParams> => {
-        const typeMatch =  action.type === type;
-        if ( promiseAction )
+    create.matchAsLinkedPromiseAction = <TParams>(action: Redux.Action, promiseAction?: CreatePromiseAction<TParams, TPayload>): action is LinkedPromiseAction<TPayload, TParams> => {
+        const typeMatch = action.type === type;
+        if (promiseAction)
             return typeMatch && (<PromiseAction>action).promiseActionType === promiseAction.type;
         return typeMatch && (<PromiseAction>action).promiseActionType !== undefined;
     };
@@ -48,8 +48,18 @@ export const createAction = <TPayload>(type: string): CreateAction<TPayload> => 
 export const createPromiseAction = <TParams, TResult>(
     type: string,
     promise: (params: TParams | undefined) => Promise<TResult>,
-    resultAction: (res: TResult, params?: TParams) => any,
-    options?: CreatePromiseActionOptions): CreatePromiseAction<TParams> => {
+    resultAction: 'AutoResult' | ((res: TResult, params?: TParams) => any),
+    options?: CreatePromiseActionOptions): CreatePromiseAction<TParams, TResult> => {
+
+    if (resultAction === 'AutoResult') {
+        resultAction = (res: TResult, params?: TParams): LinkedPromiseAction<TResult, TParams> => ({
+            promiseActionType: type,
+            promiseActionEvent: 'OnSuccess',
+            promiseActionParams: params,
+            type: `${type}_AUTO_ON_SUCCESS`,
+            payload: res
+        })
+    }
 
     let create: any = (params?: TParams) => (
         {
@@ -75,8 +85,12 @@ export const createPromiseAction = <TParams, TResult>(
         (<PromiseAction>action).promiseActionType === type &&
         (<PromiseAction>action).promiseActionEvent === 'OnError';
 
+    create.matchOnSuccess = <TPayLoad>(action: Redux.Action): action is LinkedPromiseAction<TResult, TParams> =>
+        (<PromiseAction>action).promiseActionType === type &&
+        (<PromiseAction>action).promiseActionEvent === 'OnSuccess';
+
     create.type = type;
-    return <CreatePromiseAction<TParams>>create;
+    return <CreatePromiseAction<TParams, TResult>>create;
 }
 
 
@@ -92,10 +106,10 @@ export interface ActionPromise<TParams, TResult> {
     (arg: TParams): Promise<TResult>;
 }
 
-export function createPromiseWithThunkAction<TParams, TResult>(type: string, promise: ActionPromise<TParams, TResult>, resultActionCreator: ActionCreator<TParams, TResult>, afterResultThunk: ActionThunk<TParams, TResult>, options: CreatePromiseActionOptions): CreatePromiseAction<TParams>;
-export function createPromiseWithThunkAction<TParams, TResult>(type: string, promise: ActionPromise<TParams, TResult>, resultActionCreator: ActionCreator<TParams, TResult>, afterResultThunk: ActionThunk<TParams, TResult>): CreatePromiseAction<TParams>;
-export function createPromiseWithThunkAction<TParams, TResult>(type: string, promise: ActionPromise<TParams, TResult>, thunk: ActionThunk<TParams, TResult>, options: CreatePromiseActionOptions): CreatePromiseAction<TParams>;
-export function createPromiseWithThunkAction<TParams, TResult>(type: string, promise: ActionPromise<TParams, TResult>, thunk: ActionThunk<TParams, TResult>): CreatePromiseAction<TParams>;
+export function createPromiseWithThunkAction<TParams, TResult>(type: string, promise: ActionPromise<TParams, TResult>, resultActionCreator: ActionCreator<TParams, TResult>, afterResultThunk: ActionThunk<TParams, TResult>, options: CreatePromiseActionOptions): CreatePromiseAction<TParams, TResult>;
+export function createPromiseWithThunkAction<TParams, TResult>(type: string, promise: ActionPromise<TParams, TResult>, resultActionCreator: ActionCreator<TParams, TResult>, afterResultThunk: ActionThunk<TParams, TResult>): CreatePromiseAction<TParams, TResult>;
+export function createPromiseWithThunkAction<TParams, TResult>(type: string, promise: ActionPromise<TParams, TResult>, thunk: ActionThunk<TParams, TResult>, options: CreatePromiseActionOptions): CreatePromiseAction<TParams, TResult>;
+export function createPromiseWithThunkAction<TParams, TResult>(type: string, promise: ActionPromise<TParams, TResult>, thunk: ActionThunk<TParams, TResult>): CreatePromiseAction<TParams, TResult>;
 
 
 export function createPromiseWithThunkAction<TParams, TResult>(type: string, promise: ActionPromise<TParams, TResult>, arg3?: any, arg4?: any, arg5?: any) {

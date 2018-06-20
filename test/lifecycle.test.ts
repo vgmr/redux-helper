@@ -73,7 +73,7 @@ describe("lifecycle (promise actions)", () => {
   let store: Store<IAppState>;
 
   const recreateStore = () => {
-    store = createStore<IAppState>(
+    store = createStore<IAppState, any, any, any>(
       reducer,
       applyMiddleware(lib.checkedPromiseMiddleware(opts))
     );

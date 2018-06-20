@@ -28,6 +28,7 @@ import { Store } from "redux";
 describe("checked promise", () => {
 
   const TEST_STR = 'A test';
+  const PARAM_AUTO_SUCCESS = 100;
 
   let store: Store<linkedInit.IAppState>;
 
@@ -38,20 +39,22 @@ describe("checked promise", () => {
       store = linkedInit.getStore();
       store.dispatch(linkedInit.promiseAction(TEST_STR));
       store.dispatch(linkedInit.promiseAction2('2'));
+      store.dispatch(linkedInit.promiseActionAutoSuccess(PARAM_AUTO_SUCCESS));
       store.dispatch(linkedInit.promiseActionError('err'));
     });
 
     it("should match promise", () => {
-      const { stack, linkedStart, linkedEnd, promiseStart, promiseEnd, result } = store.getState();
+      const { stack, linkedStart, linkedEnd, promiseStart, promiseEnd, promiseSuccess, result } = store.getState();
 
       expectExist(stack);
       expectExist(linkedStart);
       expectExist(linkedEnd);
       expectExist(promiseStart);
       expectExist(promiseEnd);
+      expectExist(promiseSuccess);
 
       if (!stack) throw Error("Stack is undefined (should never happen!)");
-      if (!linkedStart || !linkedEnd || !promiseStart || !promiseEnd) throw Error("Linked or Promise undefined (should never happen!)");
+      if (!linkedStart || !linkedEnd || !promiseStart || !promiseEnd || !promiseSuccess) throw Error("Linked or Promise undefined (should never happen!)");
 
       expect(linkedStart.type).toEqual(onStart.type);
       expectExist(linkedStart.payload).toEqual(`${STARTING_MESSAGE}_${promiseAction.type}`);
@@ -86,6 +89,10 @@ describe("checked promise", () => {
       expect(stack[linkedInit.promiseActionError.type].ended).toBeFalsy();
       expect(stack[linkedInit.promiseActionError.type].started).toBeTruthy();
       expectExist(stack[linkedInit.promiseActionError.type].error);
+
+      expect(promiseSuccess.payload).toEqual(`${PARAM_AUTO_SUCCESS + 1} test`);
+      expect(promiseSuccess.actionParams).toEqual(PARAM_AUTO_SUCCESS);
+
     });
 
   });

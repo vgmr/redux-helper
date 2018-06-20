@@ -40,7 +40,7 @@ export type LinkedPromiseAction<TPayload, TParams> = Action<TPayload> & PromiseA
 
 export interface PromiseAction extends Redux.Action {
     promiseActionType: string;
-    promiseActionEvent: 'OnStart' | 'OnEnd' | 'OnError';
+    promiseActionEvent: 'OnStart' | 'OnEnd' | 'OnError' | 'OnSuccess';
     promiseActionMessage?: string,
     promiseActionError?: any;
 }
@@ -49,7 +49,7 @@ export interface PromiseAction extends Redux.Action {
  * Promise Action instance (parameters)
  */
 export interface PromiseActionInstance<TParams> extends PromiseAction {
-    promiseActionParams: TParams;
+    promiseActionParams?: TParams;
 }
 
 /**
@@ -59,18 +59,19 @@ export interface CreateAction<TPayload> {
     (payload?: TPayload): Action<TPayload>;
     matchAction(action: Redux.Action): action is Action<TPayload>;
     matchAsLinkedPromiseAction<TParams>(action: Redux.Action): action is Action<TPayload> & PromiseActionInstance<TParams>;
-    matchAsLinkedPromiseAction<TParams>(action: Redux.Action, promiseAction: CreatePromiseAction<TParams>): action is Action<TPayload> & PromiseActionInstance<TParams>;
+    matchAsLinkedPromiseAction<TParams>(action: Redux.Action, promiseAction: CreatePromiseAction<TParams, TPayload>): action is Action<TPayload> & PromiseActionInstance<TParams>;
     type: string;
 }
 
 /**
  * Promise Action Interface and Creator
  */
-export interface CreatePromiseAction<TParams> {
+export interface CreatePromiseAction<TParams, TResult> {
     (params?: TParams): Redux.Action;
     matchOnStart(action: Redux.Action): action is PromiseActionInstance<TParams>;
     matchOnEnd(action: Redux.Action): action is PromiseActionInstance<TParams>;
     matchOnError(action: Redux.Action): action is PromiseActionInstance<TParams>;
+    matchOnSuccess(action: Redux.Action): action is Action<TResult> & PromiseActionInstance<TParams>;
     type: string;
 }
 

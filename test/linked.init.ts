@@ -36,8 +36,9 @@ namespace linkedInit {
     export const result = lib.createAction<string>('RESULT');
     export const promiseAction = lib.createPromiseAction('LINKED_PROMISE_ACTION', (val: string) => Promise.resolve(`${val} for test`), result);
     export const promiseAction2 = lib.createPromiseAction('LINKED_PROMISE_ACTION2', (val: string) => Promise.resolve(`${val} for test`), createAction('OTHER_RES'));
+    export const promiseActionAutoSuccess = lib.createPromiseAction('LINKED_PROMISE_ACTION_AUTO_SUCCESS', (val: number) => Promise.resolve(`${val + 1} test`), 'AutoResult');
     export const promiseActionError = lib.createPromiseAction('LINKED_PROMISE_ACTION3', (val: string) => Promise.reject('ERROR!'), createAction('NEVER DISPATCHED TO THE STORE'));
-    
+
 
     const MIDLWOPTS: CheckedPromiseMiddlewareOptions = {
         onEnd: (act) => onEnd(`${ENDING_MESSAGE}_${act!.type}`),
@@ -49,7 +50,7 @@ namespace linkedInit {
         type?: string;
         actionType?: string,
         actionParams?: any,
-        actionEvent?: 'OnStart' | 'OnEnd' | 'OnError';
+        actionEvent?: 'OnStart' | 'OnEnd' | 'OnError' | 'OnSuccess';
         payload?: any;
     }
 
@@ -58,37 +59,38 @@ namespace linkedInit {
         linkedEnd?: ActModel;
         promiseStart?: ActModel;
         promiseEnd?: ActModel;
+        promiseSuccess?: ActModel;
         result?: string;
-        stack:{ [key:string]: {started:boolean, ended?:boolean, error?: any} }
+        stack: { [key: string]: { started: boolean, ended?: boolean, error?: any } }
     }
 
-    const initialState: IAppState = { stack:{} };
+    const initialState: IAppState = { stack: {} };
 
     const reducer: Reducer<IAppState> = (state: IAppState = initialState, action: Action) => {
         let retState = undefined;
 
         if (onStart.matchAsLinkedPromiseAction(action)) {
-            let st = {...state.stack};
-            st[action.promiseActionType] = {...st[action.promiseActionType],  started: true};
+            let st = { ...state.stack };
+            st[action.promiseActionType] = { ...st[action.promiseActionType], started: true };
             retState = {
-              ...state,            
-              stack: st,
+                ...state,
+                stack: st,
             };
-          } else if (onEnd.matchAsLinkedPromiseAction(action) ) {
-                let st = {...state.stack};
-                st[action.promiseActionType] ={...st[action.promiseActionType], ended:true};
-                retState = {
-                  ...state,            
-                  stack: st,
-                };
-            } else if (onError.matchAsLinkedPromiseAction(action)){
-                let st = {...state.stack};
-                st[action.promiseActionType] ={...st[action.promiseActionType], error: `Message: ${ action.promiseActionError} - result: ${ action.payload}`};
-                retState = {
-                  ...state,            
-                  stack: st,
-                };
-            }
+        } else if (onEnd.matchAsLinkedPromiseAction(action)) {
+            let st = { ...state.stack };
+            st[action.promiseActionType] = { ...st[action.promiseActionType], ended: true };
+            retState = {
+                ...state,
+                stack: st,
+            };
+        } else if (onError.matchAsLinkedPromiseAction(action)) {
+            let st = { ...state.stack };
+            st[action.promiseActionType] = { ...st[action.promiseActionType], error: `Message: ${action.promiseActionError} - result: ${action.payload}` };
+            retState = {
+                ...state,
+                stack: st,
+            };
+        }
 
         if (onStart.matchAsLinkedPromiseAction(action, promiseAction)) {
             retState = {
@@ -144,6 +146,18 @@ namespace linkedInit {
             }
         }
 
+        if (promiseActionAutoSuccess.matchOnSuccess(action)) {
+            retState = {
+                ...state,
+                ...retState || {},
+                promiseSuccess: {
+                    type: action.type,
+                    payload: action.payload,
+                    actionParams: action.promiseActionParams
+                }
+            };
+        }
+
         if (result.matchAction(action)) {
             retState = {
                 ...state,
@@ -156,7 +170,7 @@ namespace linkedInit {
 
     export const getStore = () => {
 
-        return createStore<IAppState>(
+        return createStore<IAppState, any, any, any>(
             reducer,
             applyMiddleware(lib.checkedPromiseMiddleware(MIDLWOPTS))
         );

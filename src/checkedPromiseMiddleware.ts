@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import { Action, Dispatch, MiddlewareAPI } from 'redux';
+import { Action, Dispatch, MiddlewareAPI, AnyAction } from 'redux';
 import { PromiseAction, PromiseActionInstance } from './actionTypes'
 
 export interface CheckedPromiseMiddlewareOptions {
@@ -41,7 +41,7 @@ const _validAction = (object: any): object is Action => {
         typeof object.type === "string";
 }
 
-const checkedPromiseMiddleware = (options?: CheckedPromiseMiddlewareOptions) => (midlapi: MiddlewareAPI<any>) => (next: Dispatch<any>) => (action: any) => {
+const checkedPromiseMiddleware = (options?: CheckedPromiseMiddlewareOptions) => (midlapi: MiddlewareAPI<any>) => (next: Dispatch<AnyAction>) => (action: any) => {
     if (!action || !action.isPromiseAction || !action.payload) return next(action);
     let opts = options || {};
     const {

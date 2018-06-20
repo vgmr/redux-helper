@@ -56,5 +56,6 @@ describe('Action Creators', () => {
             resultAction);
 
         expect(promiseAction.type).toEqual('TEST_PROMISE_ACTION');
+
     })
 });
