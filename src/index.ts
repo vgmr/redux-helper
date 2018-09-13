@@ -24,7 +24,7 @@ import {
     Action,
     CreateAction,
     CreatePromiseAction,
-    CreatePromiseActionOptions,
+    CreatePromiseActionOptions,    
     LinkedPromiseAction,
     PromiseAction,
     PromiseActionInstance

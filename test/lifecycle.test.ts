@@ -1,4 +1,3 @@
-import * as mocha from "mocha";
 import * as expect from "expect";
 import * as lib from "../src";
 import { createStore, applyMiddleware, Reducer, Store } from "redux";

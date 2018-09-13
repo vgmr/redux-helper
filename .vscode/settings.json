@@ -1,3 +1,7 @@
 {
-    "vsicons.presets.angular": false
+    "vsicons.presets.angular": false,
+    "mocha.files.glob": "test/**/*.test.ts",
+    "mocha.requires": [
+        "ts-node/register"
+    ]
 }

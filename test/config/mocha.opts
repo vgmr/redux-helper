@@ -1,5 +1,5 @@
 --watch
 --require ts-node/register
---reporter min
+--reporter spec
 --watch-extensions tsx,ts,js 
 test/**/*.test.ts

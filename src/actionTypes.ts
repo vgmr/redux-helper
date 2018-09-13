@@ -67,7 +67,7 @@ export interface CreateAction<TPayload> {
  * Promise Action Interface and Creator
  */
 export interface CreatePromiseAction<TParams, TResult> {
-    (params?: TParams): Redux.Action;
+    (params?: TParams, callback?: ((res: TResult, params?: TParams) => void)): Redux.Action;
     matchOnStart(action: Redux.Action): action is PromiseActionInstance<TParams>;
     matchOnEnd(action: Redux.Action): action is PromiseActionInstance<TParams>;
     matchOnError(action: Redux.Action): action is PromiseActionInstance<TParams>;

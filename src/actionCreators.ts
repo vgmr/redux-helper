@@ -23,6 +23,7 @@
 import * as Redux from 'redux';
 import { CreateAction, Action, CreatePromiseAction, CreatePromiseActionOptions, PromiseAction, LinkedPromiseAction, PromiseActionInstance } from './index';
 
+
 // #region Action
 export const createAction = <TPayload>(type: string): CreateAction<TPayload> => {
     let create: any = <TPayload>(payload?: TPayload) => ({ type: type, payload: payload });
@@ -45,11 +46,11 @@ export const createAction = <TPayload>(type: string): CreateAction<TPayload> => 
 // #endregion
 
 // #region Promise Action
-export const createPromiseAction = <TParams, TResult>(
+export function createPromiseAction<TParams, TResult>(
     type: string,
     promise: (params: TParams | undefined) => Promise<TResult>,
     resultAction: 'AutoResult' | ((res: TResult, params?: TParams) => any),
-    options?: CreatePromiseActionOptions): CreatePromiseAction<TParams, TResult> => {
+    options?: CreatePromiseActionOptions): CreatePromiseAction<TParams, TResult> {
 
     if (resultAction === 'AutoResult') {
         resultAction = (res: TResult, params?: TParams): LinkedPromiseAction<TResult, TParams> => ({
@@ -61,13 +62,19 @@ export const createPromiseAction = <TParams, TResult>(
         })
     }
 
-    let create: any = (params?: TParams) => (
+    let create: any = (params?: TParams, callback?: ((res: TResult, params?: TParams) => void)) => (
         {
             type: type,
             isPromiseAction: true,
             payload: Object.assign({}, options, {
                 promiseParams: params,
-                promise: promise(params),
+                promise: callback ? promise(params).then(r => {
+                    try {
+                        callback!(r, params);
+                    } finally {
+                        return r
+                    }
+                }) : promise(params),
                 resultAction: resultAction
             })
         }
@@ -92,7 +99,6 @@ export const createPromiseAction = <TParams, TResult>(
     create.type = type;
     return <CreatePromiseAction<TParams, TResult>>create;
 }
-
 
 export interface ActionThunk<TParams, TResult> {
     (dispatch: Redux.Dispatch<any>, getState: () => any, res: TResult, params?: TParams): void;
