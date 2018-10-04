@@ -81,8 +81,8 @@ describe("callback (promise actions)", () => {
             promiseActionParams = "bbb";
             recreateStore();
             store.dispatch(promiseAction(promiseActionParams, (res, params) => {
-                console.log(`Callback result is: ${res}`);
-                console.log(`Callback parameters are: ${params}`);
+                console.log(`--- callback result is: ${res}`);
+                console.log(`--- callback parameters are: ${params}`);
                 done();
             }));
         });

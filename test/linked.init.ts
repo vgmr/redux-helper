@@ -32,10 +32,10 @@ namespace linkedInit {
     export const onEnd = lib.createAction<string>('ON_END');
     export const onError = lib.createAction<string>('ON_ERROR');
     export const result = lib.createAction<string>('RESULT');
-    export const promiseAction = lib.createPromiseAction('LINKED_PROMISE_ACTION', (val: string) => Promise.resolve(`${val} for test`), result);
-    export const promiseAction2 = lib.createPromiseAction('LINKED_PROMISE_ACTION2', (val: string) => Promise.resolve(`${val} for test`), createAction('OTHER_RES'));
-    export const promiseActionAutoSuccess = lib.createPromiseAction('LINKED_PROMISE_ACTION_AUTO_SUCCESS', (val: number) => Promise.resolve(`${val + 1} test`), 'AutoResult');
-    export const promiseActionError = lib.createPromiseAction('LINKED_PROMISE_ACTION3', (val: string) => Promise.reject('ERROR!'), createAction('NEVER DISPATCHED TO THE STORE'));
+    export const promiseAction = lib.createPromiseAction<string, string>('LINKED_PROMISE_ACTION', val => Promise.resolve(`${val} for test`), result);
+    export const promiseAction2 = lib.createPromiseAction<string, string>('LINKED_PROMISE_ACTION2', val => Promise.resolve(`${val} for test`), createAction('OTHER_RES'));
+    export const promiseActionAutoSuccess = lib.createPromiseAction<string, string>('LINKED_PROMISE_ACTION_AUTO_SUCCESS', (val: string) => Promise.resolve(`${val + 1} test`), 'AutoResult');
+    export const promiseActionError = lib.createPromiseAction<string, string>('LINKED_PROMISE_ACTION3', (val: string) => Promise.reject('ERROR!'), createAction('NEVER DISPATCHED TO THE STORE'));
 
 
     const MIDLWOPTS: CheckedPromiseMiddlewareOptions = {

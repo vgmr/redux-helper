@@ -32,6 +32,6 @@
     "release": "npm run build && npm version patch && npm publish",
     "build": "rimraf dist && tsc",
     "postbuild": "babel dist -d dist",
-    "test": "mocha test/config/testSetup.js --opts test/config/mocha.opts"
+    "test": "mocha --opts test/config/mocha.opts"
   }
 }
