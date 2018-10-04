@@ -19,11 +19,9 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-import * as mocha from "mocha";
 import * as lib from "../src";
-import { CheckedPromiseMiddlewareOptions, PromiseActionInstance } from "../src";
+import { CheckedPromiseMiddlewareOptions } from "../src";
 import { Reducer, Action, createStore, applyMiddleware } from "redux";
-import { access } from "fs";
 import { createAction } from "../src/actionCreators";
 
 namespace linkedInit {
