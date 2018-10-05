@@ -28,7 +28,7 @@ import { Store } from "redux";
 describe("checked promise", () => {
 
   const TEST_STR = 'A test';
-  const PARAM_AUTO_SUCCESS = 100;
+  const PARAM_AUTO_SUCCESS = "100";
 
   let store: Store<linkedInit.IAppState>;
 

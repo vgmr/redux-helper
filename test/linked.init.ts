@@ -34,7 +34,7 @@ namespace linkedInit {
     export const result = lib.createAction<string>('RESULT');
     export const promiseAction = lib.createPromiseAction<string, string>('LINKED_PROMISE_ACTION', val => Promise.resolve(`${val} for test`), result);
     export const promiseAction2 = lib.createPromiseAction<string, string>('LINKED_PROMISE_ACTION2', val => Promise.resolve(`${val} for test`), createAction('OTHER_RES'));
-    export const promiseActionAutoSuccess = lib.createPromiseAction<string, string>('LINKED_PROMISE_ACTION_AUTO_SUCCESS', (val: string) => Promise.resolve(`${val + 1} test`), 'AutoResult');
+    export const promiseActionAutoSuccess = lib.createPromiseAction('LINKED_PROMISE_ACTION_AUTO_SUCCESS', (val: string) => Promise.resolve(`${val + 1} test`), 'AutoResult');
     export const promiseActionError = lib.createPromiseAction<string, string>('LINKED_PROMISE_ACTION3', (val: string) => Promise.reject('ERROR!'), createAction('NEVER DISPATCHED TO THE STORE'));
 
 
